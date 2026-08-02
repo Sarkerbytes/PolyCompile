@@ -1,0 +1,18 @@
+            C ABSTRACT SYNTAX TREE       
+ProgramNode:
+  FunctionNode: int main()
+    BlockNode:
+      VarDeclNode: int c =
+        LiteralNode (int): 1
+      WhileNode:
+        BinaryExprNode: (<=)
+          VarExprNode: c
+          LiteralNode (int): 10
+        BlockNode:
+          OutputNode (newline=false):
+            LiteralNode (string): "%d "
+            VarExprNode: c
+          UnaryExprNode: (post++)
+            VarExprNode: c
+      ReturnNode:
+        LiteralNode (int): 0

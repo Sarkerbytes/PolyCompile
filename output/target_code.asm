@@ -1,0 +1,29 @@
+.DATA
+.CODE
+main:
+  MOV R1, 1
+  STORE R1, c
+L0:
+  LOAD R1, c
+  LOAD R2, 10
+  CMP R1, R2
+  STORE R1, t0
+  LOAD R1, t0
+  CMP R1, 0
+  JMP_EQ L1
+  LOAD R1, "%d "
+  PRINT R1
+  LOAD R1, c
+  PRINT R1
+  LOAD R1, c
+  LOAD R2, 1
+  ADD R1, R2
+  STORE R1, t2
+  MOV R1, t2
+  STORE R1, c
+  JMP L0
+L1:
+  LOAD R1, 0
+  RET
+  LOAD R1, 0
+  RET
