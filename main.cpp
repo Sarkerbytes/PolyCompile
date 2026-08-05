@@ -1,11 +1,5 @@
-/*
- * ============================================================
- *  PolyCompiler - Professional Multi-Language Compiler
- *  Supports: C, C++, and Java subsets
- *  Pipeline: Lexer -> Parser -> Semantic -> IR -> Optimizer -> CodeGen -> Executor
- *  Author: PolyCompile Team
- * ============================================================
- */
+
+ 
 
 #include <iostream>
 #include <string>
@@ -907,7 +901,7 @@ void printTACColumnar(const std::vector<TACInstruction>& tac, bool showOrigExpr)
                 std::cout << "\n";  // blank line between header and TAC steps
             }
 
-            // -- TAC instruction lines ------------------------------------
+            //  TAC instruction lines 
             size_t maxLines = 0;
             for (auto* g : row) maxLines = std::max(maxLines, g->lines.size());
 
