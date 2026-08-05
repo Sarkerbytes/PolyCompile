@@ -1,5 +1,4 @@
-C SEMANTIC ANALYSIS REPORT: 
- 
-Function declared: int main
-Variable declared: int day
+C++ SEMANTIC ANALYSIS REPORT
+----------------------------
+C++ Function declared: int main
 Semantic analysis completed with 0 errors.
