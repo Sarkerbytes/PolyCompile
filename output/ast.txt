@@ -1,22 +1,20 @@
 
-           C++ ABSTRACT SYNTAX TREE     
+          JAVA ABSTRACT SYNTAX TREE     
 
 ProgramNode:
-  FunctionNode: int main()
+  FunctionNode: void main()
     BlockNode:
-      ForNode:
-        Init:
-          VarDeclNode: int i =
-            LiteralNode (int): 1
-        Cond:
-          BinaryExprNode: (<)
-            VarExprNode: i
-            LiteralNode (int): 5
-        Update:
-          UnaryExprNode: (post++)
-            VarExprNode: i
-        Body:
-          BlockNode:
-            OutputNode (newline=true):
-              VarExprNode: i
-              LiteralNode (string): " "
+      OutputNode (newline=true):
+        LiteralNode (string): "Hello, World!\n"
+      VarDeclNode: int x =
+        LiteralNode (int): 10
+      VarDeclNode: int y =
+        LiteralNode (int): 20
+      VarDeclNode: int result =
+        BinaryExprNode: (+)
+          VarExprNode: x
+          VarExprNode: y
+      OutputNode (newline=true):
+        BinaryExprNode: (+)
+          LiteralNode (string): "Result = "
+          VarExprNode: result

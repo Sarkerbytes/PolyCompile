@@ -1,28 +1,23 @@
 .DATA
 .CODE
 main:
-  MOV R1, 1
-  STORE R1, i
-L0:
-  LOAD R1, i
-  LOAD R2, 5
-  CMP R1, R2
-  STORE R1, t0
-  LOAD R1, t0
-  CMP R1, 0
-  JMP_EQ L2
-  LOAD R1, i
+  LOAD R1, "Hello, World!\n"
   PRINT R1
-  LOAD R1, " "
-  PRINT R1
-L1:
-  LOAD R1, i
-  LOAD R2, 1
+  MOV R1, 10
+  STORE R1, x
+  MOV R1, 20
+  STORE R1, y
+  LOAD R1, 10
+  LOAD R2, 20
   ADD R1, R2
-  STORE R1, t2
-  MOV R1, t2
-  STORE R1, i
-  JMP L0
-L2:
+  STORE R1, t0
+  MOV R1, t0
+  STORE R1, result
+  LOAD R1, "Result = "
+  LOAD R2, t0
+  ADD R1, R2
+  STORE R1, t1
+  LOAD R1, t1
+  PRINT R1
   LOAD R1, 0
   RET

@@ -1,4 +1,8 @@
-C++ SEMANTIC ANALYSIS REPORT
-----------------------------
-C++ Function declared: int main
+JAVA SEMANTIC ANALYSIS REPORT
+------------------------------
+Main method found: void main(String[] args)
+Java Method declared: void main
+Java Variable declared: int x
+Java Variable declared: int y
+Java Variable declared: int result
 Semantic analysis completed with 0 errors.
