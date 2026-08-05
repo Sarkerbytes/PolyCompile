@@ -193,7 +193,7 @@ PolyCompile/
 │   │   └── Executor/
 │   │       ├── Executor.hpp/.cpp    ← Virtual runtime executor
 │   │
-│   ├── c/                           ← C Frontend
+│   ├── c/                         
 │   │   ├── lexer/Lexer_C.hpp/.cpp
 │   │   ├── parser/Parser_C.hpp/.cpp
 │   │   ├── semantic/Semantic_C.hpp/.cpp
@@ -201,7 +201,7 @@ PolyCompile/
 │   │   ├── ast/AST_C.hpp
 │   │   └── frontend/Frontend_C.hpp/.cpp
 │   │
-│   ├── cpp/                         ← C++ Frontend
+│   ├── cpp/                        
 │   │   ├── lexer/Lexer_CPP.hpp/.cpp
 │   │   ├── parser/Parser_CPP.hpp/.cpp
 │   │   ├── semantic/Semantic_CPP.hpp/.cpp
@@ -209,7 +209,7 @@ PolyCompile/
 │   │   ├── ast/AST_CPP.hpp
 │   │   └── frontend/Frontend_CPP.hpp/.cpp
 │   │
-│   └── java/                        ← Java Frontend
+│   └── java/                      
 │       ├── lexer/Lexer_Java.hpp/.cpp
 │       ├── parser/Parser_Java.hpp/.cpp
 │       ├── semantic/Semantic_Java.hpp/.cpp
