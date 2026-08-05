@@ -1,0 +1,49 @@
+            C ABSTRACT SYNTAX TREE       
+ProgramNode:
+  FunctionNode: int main()
+    BlockNode:
+      VarDeclNode: int day =
+        LiteralNode (int): 3
+      SwitchNode:
+        VarExprNode: day
+        Case:
+          LiteralNode (int): 1
+          OutputNode (newline=true):
+            LiteralNode (string): "Monday\n"
+          BreakNode
+        Case:
+          LiteralNode (int): 2
+          OutputNode (newline=true):
+            LiteralNode (string): "Tuesday\n"
+          BreakNode
+        Case:
+          LiteralNode (int): 3
+          OutputNode (newline=true):
+            LiteralNode (string): "Wednesday\n"
+          BreakNode
+        Case:
+          LiteralNode (int): 4
+          OutputNode (newline=true):
+            LiteralNode (string): "Thursday\n"
+          BreakNode
+        Case:
+          LiteralNode (int): 5
+          OutputNode (newline=true):
+            LiteralNode (string): "Friday\n"
+          BreakNode
+        Case:
+          LiteralNode (int): 6
+          OutputNode (newline=true):
+            LiteralNode (string): "Saturday\n"
+          BreakNode
+        Case:
+          LiteralNode (int): 7
+          OutputNode (newline=true):
+            LiteralNode (string): "Sunday\n"
+          BreakNode
+        Default:
+          OutputNode (newline=true):
+            LiteralNode (string): "Invalid Input\n"
+          BreakNode
+      ReturnNode:
+        LiteralNode (int): 0

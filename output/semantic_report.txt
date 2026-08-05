@@ -1,0 +1,5 @@
+C SEMANTIC ANALYSIS REPORT: 
+ 
+Function declared: int main
+Variable declared: int day
+Semantic analysis completed with 0 errors.
