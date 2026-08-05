@@ -1,0 +1,44 @@
+main:
+day = 3
+t0 = 3 == 1
+ifTrue t0 goto L1
+t1 = day == 2
+ifTrue t1 goto L2
+t2 = day == 3
+ifTrue t2 goto L3
+t3 = day == 4
+ifTrue t3 goto L4
+t4 = day == 5
+ifTrue t4 goto L5
+t5 = day == 6
+ifTrue t5 goto L6
+t6 = day == 7
+ifTrue t6 goto L7
+goto L8
+L1:
+print "Monday\n"
+goto L0
+L2:
+print "Tuesday\n"
+goto L0
+L3:
+print "Wednesday\n"
+goto L0
+L4:
+print "Thursday\n"
+goto L0
+L5:
+print "Friday\n"
+goto L0
+L6:
+print "Saturday\n"
+goto L0
+L7:
+print "Sunday\n"
+goto L0
+L8:
+print "Invalid Input\n"
+goto L0
+L0:
+return 0
+return 0
