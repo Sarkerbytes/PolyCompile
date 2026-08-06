@@ -15,8 +15,11 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 COPY . .
 
-# Build the C++ compiler binary
-RUN make all
+# Step 1: Generate flex/bison parser files for all 3 languages
+RUN make flex-c flex-cpp flex-java
+
+# Step 2: Build the C++ compiler binary (verbose for debugging)
+RUN make all VERBOSE=1 || (echo "=== MAKE FAILED ===" && cat /app/compiler/c/frontend/Frontend_C.cpp | head -5 && exit 2)
 
 # Install Node.js dependencies
 RUN cd server && npm install --omit=dev
