@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/compile",
+      "destination": "https://polycompile-backend.onrender.com/compile"
+    }
+  ]
+}

@@ -6,12 +6,12 @@ const fs           = require('fs');
 const { execFile } = require('child_process');
 
 const app  = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 /* --- Paths --------------------------------------- */
 const FRONTEND_DIR = __dirname;
 const ROOT_DIR     = path.resolve(FRONTEND_DIR, '..');
-const POLY_EXE     = path.join(ROOT_DIR, 'polycompile.exe');
+const POLY_EXE     = path.join(ROOT_DIR, process.platform === 'win32' ? 'polycompile.exe' : 'polycompile');
 const OUTPUT_DIR   = path.join(ROOT_DIR, 'output');
 const TEMP_DIR     = path.join(FRONTEND_DIR, 'temp');
 
@@ -19,8 +19,8 @@ const TEMP_DIR     = path.join(FRONTEND_DIR, 'temp');
 if (!fs.existsSync(TEMP_DIR)) fs.mkdirSync(TEMP_DIR, { recursive: true });
 
 if (!fs.existsSync(POLY_EXE)) {
-  console.error(`\n  [ERROR] polycompile.exe not found at:\n  ${POLY_EXE}`);
-  console.error('  Run `mingw32-make` in the project root to build it first.\n');
+  console.error(`\n  [ERROR] polycompile executable not found at:\n  ${POLY_EXE}`);
+  console.error('  Run `make` or `mingw32-make` in the project root to build it first.\n');
   process.exit(1);
 }
 
