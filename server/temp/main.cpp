@@ -1,11 +1,15 @@
 #include <iostream>
+
 using namespace std;
 
 int main() {
-  cout << "Hello, World!" << endl;
-  int x = 10;
-  int y = 20;
-  int result = x + y;
-  cout << "Result = " << result << endl;
-  return 0;
+    int total = 0;
+    
+    for (int i = 0; i < 1000000; i++) {
+        total += i;
+    }
+    
+    cout << "Total sum: " << total << endl;
+    
+    return 0;
 }

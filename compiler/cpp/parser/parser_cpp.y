@@ -62,6 +62,7 @@ void yyerror(const char* msg) {
 %token <string_val> KEYWORD_FLOAT
 %token <string_val> KEYWORD_CHAR
 %token <string_val> KEYWORD_DOUBLE
+%token <string_val> KEYWORD_LONG
 %token <string_val> KEYWORD_BOOL
 %token              KEYWORD_VOID
 
@@ -213,6 +214,8 @@ type_specifier
     | KEYWORD_FLOAT  { $$ = $1; }
     | KEYWORD_CHAR   { $$ = $1; }
     | KEYWORD_DOUBLE { $$ = $1; }
+    | KEYWORD_LONG   { $$ = $1; }
+    | KEYWORD_LONG KEYWORD_LONG { $$ = strdup("long long"); free($1); free($2); }
     | KEYWORD_BOOL   { $$ = $1; }
     | KEYWORD_STRING { $$ = $1; }
     | KEYWORD_VOID   { $$ = "void"; }

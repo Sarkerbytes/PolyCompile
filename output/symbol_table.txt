@@ -1,7 +1,34 @@
 
-           C++ SYMBOL TABLE             
+           JAVA SYMBOL TABLE            
 
 Scope Level | Name | Type | Kind | Params
 ----------------------------------------
-  Level 0   | main | int | Function | 
+  Level 0   | main | void | Method | 
+  Level 2   | x | int | Variable | 
+  Level 2   | y | int | Variable | 
+  Level 2   | result | int | Variable | 
+========================================
+
+          TOKEN IDENTIFIERS             
+
+      Identifiers | No.
+      -----------+-----
+      import      | id1
+      java        | id2
+      util        | id3
+      Scanner     | id4
+      public      | id5
+      class       | id6
+      Hello       | id7
+      static      | id8
+      main        | id9
+      String      | id10
+      args        | id11
+      System      | id12
+      out         | id13
+      println     | id14
+      x           | id15
+      y           | id16
+      result      | id17
+
 ========================================

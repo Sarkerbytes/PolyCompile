@@ -43,14 +43,14 @@ int main() {
 
 const FILE_NAMES = {
   java: 'Hello.java',
-  cpp:  'hello.cpp',
-  c:    'hello.c'
+  cpp: 'hello.cpp',
+  c: 'hello.c'
 };
 
 const LANG_LABELS = {
   java: 'Java',
-  cpp:  'C++',
-  c:    'C'
+  cpp: 'C++',
+  c: 'C'
 };
 
 /* ------------ OUTPUT DATA ------------ 
@@ -89,34 +89,35 @@ function getOutputData(tab, lang) {
   if (!real) return READY_MSG(tab);
   if (real._offline) return SERVER_OFFLINE_MSG;
   switch (tab) {
-    case 'tokens':  return real.tokens  || '(tokens.txt was not generated)';
-    case 'ast':     return real.ast     || '(ast.txt was not generated)';
-    case 'symbols': return real.symbols || '(symbol_table.txt was not generated)';
-    case 'tac':     return real.tac     || '(tac.txt was not generated)';
-    case 'opt':     return real.opt     || '(optimized_tac.txt was not generated)';
-    case 'asm':     return real.asm     || '(target_code.asm was not generated)';
-    case 'exec':    return real.exec    || '(no execution output)';
-    default:        return '';
+    case 'tokens':    return real.tokens    || '(tokens.txt was not generated)';
+    case 'ast':       return real.ast       || '(ast.txt was not generated)';
+    case 'parsetree': return real.parseTree || '(parse_tree.txt was not generated)';
+    case 'symbols':   return real.symbols   || '(symbol_table.txt was not generated)';
+    case 'tac':       return real.tac       || '(tac.txt was not generated)';
+    case 'opt':       return real.opt       || '(optimized_tac.txt was not generated)';
+    case 'asm':       return real.asm       || '(target_code.asm was not generated)';
+    case 'exec':      return real.exec      || '(no execution output)';
+    default:          return '';
   }
 }
 
 const OUTPUT_FILES = {
-  tokens:  'output/tokens.txt',
-  ast:     'output/ast.txt',
-  symbols: 'output/symbol_table.txt',
-  tac:     'output/tac.txt',
-  opt:     'output/optimized_tac.txt',
-  asm:     'output/target_code.asm',
-  exec:    '[ PolyCompile Executor ]'
+  tokens:    'output/tokens.txt',
+  ast:       'output/ast.txt',
+  parsetree: 'output/parse_tree.txt',
+  symbols:   'output/symbol_table.txt',
+  tac:       'output/tac.txt',
+  opt:       'output/optimized_tac.txt',
+  asm:       'output/target_code.asm',
+  exec:      '[ PolyCompile Executor ]'
 };
 
-/* â•â•â•â•â•â•â•â•â•â•â•â• STATE â•â•â•â•â•â•â•â•â•â•â•â• */
-let currentLang       = 'java';
-let currentOutputTab  = 'tokens';
-let pipelineTimer     = null;
-let pipelinePhase     = 0;
-let isAnimating       = false;
-let countersStarted   = false;
+let currentLang = 'java';
+let currentOutputTab = 'tokens';
+let pipelineTimer = null;
+let pipelinePhase = 0;
+let isAnimating = false;
+let countersStarted = false;
 
 (function initParticles() {
   const canvas = document.getElementById('particleCanvas');
@@ -129,18 +130,18 @@ let countersStarted   = false;
   const COLORS = ['rgba(0,212,255,', 'rgba(124,58,237,', 'rgba(255,0,128,', 'rgba(0,255,136,'];
 
   function resize() {
-    W = canvas.width  = window.innerWidth;
+    W = canvas.width = window.innerWidth;
     H = canvas.height = window.innerHeight;
   }
 
   function createParticle() {
     const color = COLORS[Math.floor(Math.random() * COLORS.length)];
     return {
-      x:     Math.random() * W,
-      y:     Math.random() * H,
-      r:     Math.random() * 1.5 + 0.3,
-      vx:    (Math.random() - 0.5) * 0.4,
-      vy:    (Math.random() - 0.5) * 0.4,
+      x: Math.random() * W,
+      y: Math.random() * H,
+      r: Math.random() * 1.5 + 0.3,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
       alpha: Math.random() * 0.5 + 0.1,
       color
     };
@@ -384,12 +385,12 @@ function updateCommandPreview() {
 
   const flagMap = {
     'flag-tokens': '--tokens',
-    'flag-ast':    '--ast',
-    'flag-sym':    '--symbol-table',
-    'flag-tac':    '--tac',
-    'flag-opt':    '--opt',
-    'flag-asm':    '--asm',
-    'flag-debug':  '--debug'
+    'flag-ast': '--ast',
+    'flag-sym': '--symbol-table',
+    'flag-tac': '--tac',
+    'flag-opt': '--opt',
+    'flag-asm': '--asm',
+    'flag-debug': '--debug'
   };
   const flags = [];
   for (const [id, flag] of Object.entries(flagMap)) {
@@ -407,9 +408,9 @@ function updateCommandPreview() {
 
 /* â•â•â•â•â•â•â•â•â•â•â•â• COMPILE BUTTON â•â•â•â•â•â•â•â•â•â•â•â• */
 (function initCompileBtn() {
-  const btn    = document.getElementById('compileBtn');
-  const icon   = document.getElementById('compileBtnIcon');
-  const label  = document.getElementById('compileBtnLabel');
+  const btn = document.getElementById('compileBtn');
+  const icon = document.getElementById('compileBtnIcon');
+  const label = document.getElementById('compileBtnLabel');
   const status = document.getElementById('compileStatus');
   if (!btn) return;
 
@@ -418,7 +419,7 @@ function updateCommandPreview() {
 
     btn.classList.remove('done');
     btn.classList.add('running');
-    if (icon)  icon.textContent  = '';
+    if (icon) icon.textContent = '';
     if (label) label.textContent = 'Compiling...';
     if (status) { status.textContent = ''; status.style.color = 'var(--cyan)'; }
 
@@ -446,9 +447,9 @@ function updateCommandPreview() {
     // ── Call real PolyCompile backend ──
     try {
       const resp = await fetch('/compile', {
-        method:  'POST',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ code, lang: currentLang })
+        body: JSON.stringify({ code, lang: currentLang })
       });
       if (resp.ok) {
         window._realOutput = await resp.json();
@@ -487,7 +488,7 @@ function updateCommandPreview() {
     }, 400);
     setTimeout(() => {
       btn.classList.remove('done');
-      if (icon)  icon.textContent  = '▶';
+      if (icon) icon.textContent = '▶';
       if (label) label.textContent = 'Compile & Run';
       if (status) status.textContent = '';
     }, 4000);
@@ -496,7 +497,7 @@ function updateCommandPreview() {
 
 /* â•â•â•â•â•â•â•â•â•â•â•â• PIPELINE ANIMATION â•â•â•â•â•â•â•â•â•â•â•â• */
 (function initPipeline() {
-  const animBtn  = document.getElementById('animatePipelineBtn');
+  const animBtn = document.getElementById('animatePipelineBtn');
   const resetBtn = document.getElementById('resetPipelineBtn');
   const progress = document.getElementById('pipelineProgress');
 
@@ -515,7 +516,7 @@ function resetPipeline() {
   if (progress) progress.style.width = '0%';
   const btn = document.getElementById('animatePipelineBtn');
   const icon = document.getElementById('animBtnIcon');
-  if (btn)  btn.disabled = false;
+  if (btn) btn.disabled = false;
   if (icon) icon.textContent = '▶';
 }
 
@@ -523,9 +524,9 @@ function startPipelineAnimation() {
   if (isAnimating) return;
   resetPipeline();
   isAnimating = true;
-  const btn  = document.getElementById('animatePipelineBtn');
+  const btn = document.getElementById('animatePipelineBtn');
   const icon = document.getElementById('animBtnIcon');
-  if (btn)  btn.disabled = true;
+  if (btn) btn.disabled = true;
   if (icon) icon.textContent = '';
 
   animateNextPhase();
@@ -534,9 +535,9 @@ function startPipelineAnimation() {
 function animateNextPhase() {
   if (pipelinePhase >= 6) {
     isAnimating = false;
-    const btn  = document.getElementById('animatePipelineBtn');
+    const btn = document.getElementById('animatePipelineBtn');
     const icon = document.getElementById('animBtnIcon');
-    if (btn)  btn.disabled = false;
+    if (btn) btn.disabled = false;
     if (icon) icon.textContent = '✓';
     return;
   }
@@ -572,7 +573,7 @@ function switchOutputTab(tab) {
   const tabs = document.querySelectorAll('.otab');
   tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
 
-  const content  = document.getElementById('outputContent');
+  const content = document.getElementById('outputContent');
   const fileLabel = document.getElementById('opFileLabel');
 
   if (content) {
@@ -590,14 +591,14 @@ function switchOutputTab(tab) {
 
 /* Silently refresh the current output tab when language changes â€” no tab switch, no fade delay */
 function refreshOutputPanel() {
-  const content   = document.getElementById('outputContent');
+  const content = document.getElementById('outputContent');
   const fileLabel = document.getElementById('opFileLabel');
   if (content) {
-    content.style.opacity   = '0';
+    content.style.opacity = '0';
     content.style.transform = 'translateY(6px)';
     setTimeout(() => {
-      content.textContent     = getOutputData(currentOutputTab, currentLang);
-      content.style.opacity   = '1';
+      content.textContent = getOutputData(currentOutputTab, currentLang);
+      content.style.opacity = '1';
       content.style.transform = 'translateY(0)';
     }, 120);
   }
@@ -606,7 +607,7 @@ function refreshOutputPanel() {
 
 // Copy button
 (function initCopyBtn() {
-  const btn  = document.getElementById('copyOutputBtn');
+  const btn = document.getElementById('copyOutputBtn');
   const text = document.getElementById('copyBtnText');
   if (!btn) return;
 
@@ -641,7 +642,7 @@ function refreshOutputPanel() {
 /* â•â•â•â•â•â•â•â•â•â•â•â• ASM CHIP TOOLTIPS â•â•â•â•â•â•â•â•â•â•â•â• */
 (function initAsmChips() {
   const tooltip = document.getElementById('asmTooltip');
-  const chips   = document.querySelectorAll('.asm-chip');
+  const chips = document.querySelectorAll('.asm-chip');
   if (!tooltip) return;
 
   chips.forEach(chip => {
@@ -669,7 +670,7 @@ function refreshOutputPanel() {
     const x = e.clientX + 14;
     const y = e.clientY - 36;
     tooltip.style.left = `${x}px`;
-    tooltip.style.top  = `${y}px`;
+    tooltip.style.top = `${y}px`;
   }
 })();
 
@@ -690,7 +691,7 @@ function refreshOutputPanel() {
   const visual = document.getElementById('heroVisual');
   if (!visual) return;
   document.addEventListener('mousemove', e => {
-    const cx = window.innerWidth  / 2;
+    const cx = window.innerWidth / 2;
     const cy = window.innerHeight / 2;
     const dx = (e.clientX - cx) / cx;
     const dy = (e.clientY - cy) / cy;
@@ -727,9 +728,9 @@ document.addEventListener('keydown', e => {
 /* â•â•â•â•â•â•â•â•â•â•â•â• ACTIVE NAV HIGHLIGHT on scroll â•â•â•â•â•â•â•â•â•â•â•â• */
 (function initActiveNav() {
   const sections = [
-    { id: 'editor',   nav: 'navEditor'   },
+    { id: 'editor', nav: 'navEditor' },
     { id: 'pipeline', nav: 'navPipeline' },
-    { id: 'output',   nav: 'navOutput'   },
+    { id: 'output', nav: 'navOutput' },
     { id: 'features', nav: 'navFeatures' },
   ];
 
@@ -812,7 +813,7 @@ console.log(`
    Ctrl+2     → Switch to C++
    Ctrl+3     → Switch to C
 `,
-'background:#7c3aed;color:white;padding:4px 12px;border-radius:4px 4px 0 0;font-weight:bold;font-size:14px',
-'background:#0d1526;color:#00d4ff;padding:4px 12px;font-size:12px',
-'background:#0d1526;color:#8892b0;padding:4px 12px;border-radius:0 0 4px 4px;font-size:11px'
+  'background:#7c3aed;color:white;padding:4px 12px;border-radius:4px 4px 0 0;font-weight:bold;font-size:14px',
+  'background:#0d1526;color:#00d4ff;padding:4px 12px;font-size:12px',
+  'background:#0d1526;color:#8892b0;padding:4px 12px;border-radius:0 0 4px 4px;font-size:11px'
 );

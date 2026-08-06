@@ -1,51 +1,68 @@
 
-              C++ TOKENS                  
+              JAVA TOKENS                  
 
 Line : Col | Type          | Lexeme     
 ----------------------------------------
-  1  :  1  | KEYWORD       | #include <iostream>
-  2  :  1  | IDENTIFIER    | using
-  2  :  7  | IDENTIFIER    | namespace
-  2  :  17  | IDENTIFIER    | std
-  2  :  20  | OPERATOR      | ;
-  4  :  1  | KEYWORD       | int
-  4  :  5  | IDENTIFIER    | main
-  4  :  9  | OPERATOR      | (
-  4  :  10  | OPERATOR      | )
-  4  :  12  | OPERATOR      | {
-  5  :  3  | IDENTIFIER    | cout
-  5  :  8  | OPERATOR      | <<
-  5  :  11  | STRING_LITERAL | "Hello, World!"
-  5  :  27  | OPERATOR      | <<
-  5  :  30  | IDENTIFIER    | endl
-  5  :  34  | OPERATOR      | ;
-  6  :  3  | KEYWORD       | int
-  6  :  7  | IDENTIFIER    | a
-  6  :  9  | OPERATOR      | =
-  6  :  11  | INT_LITERAL   | 5
-  6  :  12  | OPERATOR      | ,
-  6  :  14  | IDENTIFIER    | b
-  6  :  16  | OPERATOR      | =
-  6  :  18  | INT_LITERAL   | 10
-  6  :  20  | OPERATOR      | ;
-  7  :  3  | KEYWORD       | int
-  7  :  7  | IDENTIFIER    | sum
+  1  :  1  | IDENTIFIER    | import
+  1  :  8  | IDENTIFIER    | java
+  1  :  12  | OPERATOR      | .
+  1  :  13  | IDENTIFIER    | util
+  1  :  17  | OPERATOR      | .
+  1  :  18  | IDENTIFIER    | Scanner
+  1  :  25  | OPERATOR      | ;
+  3  :  1  | IDENTIFIER    | public
+  3  :  8  | IDENTIFIER    | class
+  3  :  14  | IDENTIFIER    | Hello
+  3  :  20  | OPERATOR      | {
+  4  :  3  | IDENTIFIER    | public
+  4  :  10  | IDENTIFIER    | static
+  4  :  17  | KEYWORD       | void
+  4  :  22  | IDENTIFIER    | main
+  4  :  26  | OPERATOR      | (
+  4  :  27  | IDENTIFIER    | String
+  4  :  33  | OPERATOR      | [
+  4  :  34  | OPERATOR      | ]
+  4  :  36  | IDENTIFIER    | args
+  4  :  40  | OPERATOR      | )
+  4  :  42  | OPERATOR      | {
+  5  :  5  | IDENTIFIER    | System
+  5  :  11  | OPERATOR      | .
+  5  :  12  | IDENTIFIER    | out
+  5  :  15  | OPERATOR      | .
+  5  :  16  | IDENTIFIER    | println
+  5  :  23  | OPERATOR      | (
+  5  :  24  | STRING_LITERAL | "Hello, World!"
+  5  :  39  | OPERATOR      | )
+  5  :  40  | OPERATOR      | ;
+  6  :  5  | KEYWORD       | int
+  6  :  9  | IDENTIFIER    | x
+  6  :  11  | OPERATOR      | =
+  6  :  13  | INT_LITERAL   | 10
+  6  :  15  | OPERATOR      | ;
+  7  :  5  | KEYWORD       | int
+  7  :  9  | IDENTIFIER    | y
   7  :  11  | OPERATOR      | =
-  7  :  13  | IDENTIFIER    | a
-  7  :  15  | OPERATOR      | +
-  7  :  17  | IDENTIFIER    | b
-  7  :  18  | OPERATOR      | ;
-  8  :  3  | IDENTIFIER    | cout
-  8  :  8  | OPERATOR      | <<
-  8  :  11  | STRING_LITERAL | "Sum: "
-  8  :  19  | OPERATOR      | <<
-  8  :  22  | IDENTIFIER    | sum
-  8  :  26  | OPERATOR      | <<
-  8  :  29  | IDENTIFIER    | endl
-  8  :  33  | OPERATOR      | ;
-  9  :  3  | KEYWORD       | return
-  9  :  10  | INT_LITERAL   | 0
-  9  :  11  | OPERATOR      | ;
-  10  :  1  | OPERATOR      | }
-  11  :  1  | EOF           | EOF
+  7  :  13  | INT_LITERAL   | 20
+  7  :  15  | OPERATOR      | ;
+  8  :  5  | KEYWORD       | int
+  8  :  9  | IDENTIFIER    | result
+  8  :  16  | OPERATOR      | =
+  8  :  18  | IDENTIFIER    | x
+  8  :  20  | OPERATOR      | +
+  8  :  22  | IDENTIFIER    | y
+  8  :  23  | OPERATOR      | ;
+  9  :  5  | IDENTIFIER    | System
+  9  :  11  | OPERATOR      | .
+  9  :  12  | IDENTIFIER    | out
+  9  :  15  | OPERATOR      | .
+  9  :  16  | IDENTIFIER    | println
+  9  :  23  | OPERATOR      | (
+  9  :  24  | STRING_LITERAL | "Result = "
+  9  :  36  | OPERATOR      | +
+  9  :  38  | IDENTIFIER    | result
+  9  :  44  | OPERATOR      | )
+  9  :  45  | OPERATOR      | ;
+  10  :  3  | OPERATOR      | }
+  11  :  1  | OPERATOR      | }
+  12  :  1  | EOF           | EOF
 

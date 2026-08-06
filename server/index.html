@@ -1,16 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PolyCompile — Multi-Language Educational Compiler</title>
-  <meta name="description" content="PolyCompile: A professional multi-language educational compiler supporting C, C++, and Java with a complete 6-phase compilation pipeline featuring lexical analysis, AST, TAC, optimization, and assembly generation.">
+  <meta name="description"
+    content="PolyCompile: A professional multi-language educational compiler supporting C, C++, and Java with a complete 6-phase compilation pipeline featuring lexical analysis, AST, TAC, optimization, and assembly generation.">
   <meta name="keywords" content="compiler, C, C++, Java, lexer, parser, AST, TAC, assembly, educational, polycompile">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Outfit:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Outfit:wght@300;400;500;600;700;900&display=swap"
+    rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
   <!-- ═══ NAVBAR ═══ -->
@@ -28,7 +33,10 @@
     <div class="nav-right">
       <span class="nav-version">v1.0</span>
       <a href="https://github.com" class="nav-github" aria-label="GitHub">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
+        </svg>
       </a>
     </div>
   </nav>
@@ -58,7 +66,8 @@
         </p>
 
         <p class="hero-desc">
-          A complete 6-phase compilation pipeline — from lexical analysis to executable educational assembly — supporting <strong>C</strong>, <strong>C++</strong>, and <strong>Java</strong>.
+          A complete 6-phase compilation pipeline — from lexical analysis to executable educational assembly —
+          supporting <strong>C</strong>, <strong>C++</strong>, and <strong>Java</strong>.
         </p>
 
         <div class="hero-actions">
@@ -69,7 +78,9 @@
           </a>
           <a href="#pipeline" class="btn-ghost" id="explorePipelineBtn">
             Explore Pipeline
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
           </a>
         </div>
 
@@ -179,17 +190,12 @@
           </div>
           <div class="editor-body">
             <div class="line-numbers" id="lineNumbers">1</div>
-            <textarea
-              class="code-editor"
-              id="codeEditor"
-              spellcheck="false"
-              autocomplete="off"
-              autocorrect="off"
-              autocapitalize="off"
-            ></textarea>
+            <textarea class="code-editor" id="codeEditor" spellcheck="false" autocomplete="off" autocorrect="off"
+              autocapitalize="off"></textarea>
           </div>
           <!-- New Footer for Compile Button -->
-          <div class="editor-footer" style="padding: 16px; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: flex-end; gap: 12px; background: rgba(0,0,0,0.15);">
+          <div class="editor-footer"
+            style="padding: 16px; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: flex-end; gap: 12px; background: rgba(0,0,0,0.15);">
             <button class="compile-btn" id="compileBtn" style="max-width: 280px;">
               <div class="compile-bg"></div>
               <span class="compile-icon" id="compileBtnIcon">▶</span>
@@ -209,7 +215,8 @@
     <div class="section-header">
       <div class="section-tag" id="pipelineTag">Architecture</div>
       <h2 class="section-title">6-Phase <span class="accent-text">Compilation Pipeline</span></h2>
-      <p class="section-desc">Every source file flows through six carefully orchestrated phases — from raw characters to executable instructions.</p>
+      <p class="section-desc">Every source file flows through six carefully orchestrated phases — from raw characters to
+        executable instructions.</p>
     </div>
 
     <div class="pipeline-wrapper">
@@ -282,13 +289,15 @@
     <div class="section-header">
       <div class="section-tag" id="outputTag">Compiler Output</div>
       <h2 class="section-title">Every Phase. <span class="accent-text">Fully Visible.</span></h2>
-      <p class="section-desc">Inspect every artifact produced during compilation — from raw tokens to final assembly.</p>
+      <p class="section-desc">Inspect every artifact produced during compilation — from raw tokens to final assembly.
+      </p>
     </div>
 
     <div class="output-container">
       <div class="output-tabs" id="outputTabs" role="tablist">
         <button class="otab active" data-tab="tokens" id="otab-tokens" role="tab">Tokens</button>
         <button class="otab" data-tab="ast" id="otab-ast" role="tab">AST</button>
+        <button class="otab" data-tab="parsetree" id="otab-parsetree" role="tab">Parse Tree</button>
         <button class="otab" data-tab="symbols" id="otab-symbols" role="tab">Symbol Table</button>
         <button class="otab" data-tab="tac" id="otab-tac" role="tab">TAC</button>
         <button class="otab" data-tab="opt" id="otab-opt" role="tab">Opt. TAC</button>
@@ -303,7 +312,10 @@
             <span class="op-file-label" id="opFileLabel">output/tokens.txt</span>
           </div>
           <button class="copy-btn" id="copyOutputBtn" aria-label="Copy to clipboard">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" />
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+            </svg>
             <span id="copyBtnText">Copy</span>
           </button>
         </div>
@@ -319,7 +331,8 @@
     <div class="section-header">
       <div class="section-tag" id="featuresTag">Optimizations</div>
       <h2 class="section-title">5 Optimization <span class="accent-text">Passes</span></h2>
-      <p class="section-desc">PolyCompile performs 5 consecutive passes on the Three Address Code to produce leaner, faster programs.</p>
+      <p class="section-desc">PolyCompile performs 5 consecutive passes on the Three Address Code to produce leaner,
+        faster programs.</p>
     </div>
 
     <div class="opt-grid">
@@ -419,15 +432,60 @@
           <div class="mc cpp-col">C++</div>
           <div class="mc java-col">Java</div>
         </div>
-        <div class="matrix-row"><div class="mc feature-col">Lexical Analysis</div><div class="mc c-col chk">✓</div><div class="mc cpp-col chk">✓</div><div class="mc java-col chk">✓</div></div>
-        <div class="matrix-row"><div class="mc feature-col">Recursive Descent Parser</div><div class="mc c-col chk">✓</div><div class="mc cpp-col chk">✓</div><div class="mc java-col chk">✓</div></div>
-        <div class="matrix-row"><div class="mc feature-col">Scoped Symbol Table</div><div class="mc c-col chk">✓</div><div class="mc cpp-col chk">✓</div><div class="mc java-col chk">✓</div></div>
-        <div class="matrix-row"><div class="mc feature-col">Semantic Analysis</div><div class="mc c-col chk">✓</div><div class="mc cpp-col chk">✓</div><div class="mc java-col chk">✓</div></div>
-        <div class="matrix-row"><div class="mc feature-col">AST Generation</div><div class="mc c-col chk">✓</div><div class="mc cpp-col chk">✓</div><div class="mc java-col chk">✓</div></div>
-        <div class="matrix-row"><div class="mc feature-col">IR / TAC Generation</div><div class="mc c-col chk">✓</div><div class="mc cpp-col chk">✓</div><div class="mc java-col chk">✓</div></div>
-        <div class="matrix-row"><div class="mc feature-col">5-Pass Optimizer</div><div class="mc c-col chk">✓</div><div class="mc cpp-col chk">✓</div><div class="mc java-col chk">✓</div></div>
-        <div class="matrix-row"><div class="mc feature-col">Assembly Code Gen</div><div class="mc c-col chk">✓</div><div class="mc cpp-col chk">✓</div><div class="mc java-col chk">✓</div></div>
-        <div class="matrix-row"><div class="mc feature-col">Virtual Executor</div><div class="mc c-col chk">✓</div><div class="mc cpp-col chk">✓</div><div class="mc java-col chk">✓</div></div>
+        <div class="matrix-row">
+          <div class="mc feature-col">Lexical Analysis</div>
+          <div class="mc c-col chk">✓</div>
+          <div class="mc cpp-col chk">✓</div>
+          <div class="mc java-col chk">✓</div>
+        </div>
+        <div class="matrix-row">
+          <div class="mc feature-col">Recursive Descent Parser</div>
+          <div class="mc c-col chk">✓</div>
+          <div class="mc cpp-col chk">✓</div>
+          <div class="mc java-col chk">✓</div>
+        </div>
+        <div class="matrix-row">
+          <div class="mc feature-col">Scoped Symbol Table</div>
+          <div class="mc c-col chk">✓</div>
+          <div class="mc cpp-col chk">✓</div>
+          <div class="mc java-col chk">✓</div>
+        </div>
+        <div class="matrix-row">
+          <div class="mc feature-col">Semantic Analysis</div>
+          <div class="mc c-col chk">✓</div>
+          <div class="mc cpp-col chk">✓</div>
+          <div class="mc java-col chk">✓</div>
+        </div>
+        <div class="matrix-row">
+          <div class="mc feature-col">AST Generation</div>
+          <div class="mc c-col chk">✓</div>
+          <div class="mc cpp-col chk">✓</div>
+          <div class="mc java-col chk">✓</div>
+        </div>
+        <div class="matrix-row">
+          <div class="mc feature-col">IR / TAC Generation</div>
+          <div class="mc c-col chk">✓</div>
+          <div class="mc cpp-col chk">✓</div>
+          <div class="mc java-col chk">✓</div>
+        </div>
+        <div class="matrix-row">
+          <div class="mc feature-col">5-Pass Optimizer</div>
+          <div class="mc c-col chk">✓</div>
+          <div class="mc cpp-col chk">✓</div>
+          <div class="mc java-col chk">✓</div>
+        </div>
+        <div class="matrix-row">
+          <div class="mc feature-col">Assembly Code Gen</div>
+          <div class="mc c-col chk">✓</div>
+          <div class="mc cpp-col chk">✓</div>
+          <div class="mc java-col chk">✓</div>
+        </div>
+        <div class="matrix-row">
+          <div class="mc feature-col">Virtual Executor</div>
+          <div class="mc c-col chk">✓</div>
+          <div class="mc cpp-col chk">✓</div>
+          <div class="mc java-col chk">✓</div>
+        </div>
       </div>
     </div>
   </section>
@@ -438,7 +496,8 @@
     <div class="section-header">
       <div class="section-tag">Target Architecture</div>
       <h2 class="section-title">Educational <span class="accent-text">Assembly</span> Instruction Set</h2>
-      <p class="section-desc">16 handcrafted instructions designed for clarity and teaching — from data movement to control flow.</p>
+      <p class="section-desc">16 handcrafted instructions designed for clarity and teaching — from data movement to
+        control flow.</p>
     </div>
 
     <div class="asm-grid" id="asmGrid">
@@ -492,4 +551,5 @@
 
   <script src="script.js"></script>
 </body>
+
 </html>

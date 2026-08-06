@@ -1,4 +1,4 @@
-﻿/*
+/*
  * ============================================================
  *  PolyCompiler - Professional Multi-Language Compiler
  *  Supports: C, C++, and Java subsets
@@ -42,7 +42,7 @@ static const std::string OUTPUT_DIR = "output/";
 bool ensureOutputDir();
 void printUsage(const char* progName);
 void printTokensToConsole(const std::vector<Token>& tokens);
-void printASTTree(ASTNodePtr root, const std::map<std::string,std::string>& identMap);
+void printASTTree(ASTNodePtr root, const std::map<std::string,std::string>& identMap, std::ostream& out = std::cout);
 void printFileToConsole(const std::string& filepath);
 void printDebugPhase(int phase, const std::string& phaseName, bool success);
 void printFileIndented(const std::string& filepath, int indentSpaces = 2);
@@ -158,6 +158,48 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    // Build identifier -> id mapping from token stream
+    std::map<std::string, std::string> identMap;  // name -> id1, id2 ...
+    std::vector<std::pair<std::string,std::string>> identOrder; // ordered
+    int idCounter = 1;
+    for (const auto& tok : tokens) {
+        if (tok.type == TokenType::IDENTIFIER) {
+            if (identMap.find(tok.lexeme) == identMap.end()) {
+                std::string idName = "id" + std::to_string(idCounter++);
+                identMap[tok.lexeme] = idName;
+                identOrder.push_back({tok.lexeme, idName});
+            }
+        }
+    }
+
+    // Append Token Symbol Table to symbol_table.txt
+    std::ofstream symOut(symTablePath, std::ios::app);
+    if (symOut.is_open()) {
+        symOut << "\n";
+        symOut << "          TOKEN IDENTIFIERS             \n";
+        symOut << "\n";
+        symOut << "      Identifiers | No.\n";
+        symOut << "      -----------+-----\n";
+        for (const auto& kv : identOrder) {
+            symOut << "      " << std::left << std::setw(12) << kv.first
+                   << "| " << kv.second << "\n";
+        }
+        if (identOrder.empty()) {
+            symOut << "      (no user-defined identifiers)\n";
+        }
+        symOut << "\n========================================\n";
+        symOut.close();
+    }
+
+    // Write ASCII Parse Tree to file
+    std::string parseTreePath = OUTPUT_DIR + "parse_tree.txt";
+    std::ofstream ptOut(parseTreePath);
+    if (ptOut.is_open()) {
+        ptOut << "- Syntax Analysis : Parse Tree -\n\n";
+        printASTTree(astRoot, identMap, ptOut);
+        ptOut.close();
+    }
+
     
     //  Phase 4: IR Generation (TAC)
 
@@ -181,20 +223,7 @@ int main(int argc, char* argv[]) {
     
     if (debugMode) {
         
-        // Build identifier -> id mapping from token stream
-        
-        std::map<std::string, std::string> identMap;  // name -> id1, id2 ...
-        std::vector<std::pair<std::string,std::string>> identOrder; // ordered
-        int idCounter = 1;
-        for (const auto& tok : tokens) {
-            if (tok.type == TokenType::IDENTIFIER) {
-                if (identMap.find(tok.lexeme) == identMap.end()) {
-                    std::string idName = "id" + std::to_string(idCounter++);
-                    identMap[tok.lexeme] = idName;
-                    identOrder.push_back({tok.lexeme, idName});
-                }
-            }
-        }
+        // identMap is already built above
 
         
         // HEADER
@@ -613,7 +642,7 @@ static int layoutASTTree(TreeNode* node, int startCol, int gap = 2)
 }
 
 // BFS level-by-level renderer: prints labels then connector row.
-static void renderASTTree(TreeNode* root)
+static void renderASTTree(TreeNode* root, std::ostream& out)
 {
     if (!root) return;
 
@@ -652,7 +681,7 @@ static void renderASTTree(TreeNode* root)
                     labelRow[pos] = n->label[i];
             }
         }
-        std::cout << rowIndent << labelRow << "\n";
+        out << rowIndent << labelRow << "\n";
 
         // --- Connector row (only between levels) ---
         if (lvl + 1 < levels.size()) {
@@ -673,17 +702,17 @@ static void renderASTTree(TreeNode* root)
                     }
                 }
             }
-            std::cout << rowIndent << connRow << "\n";
+            out << rowIndent << connRow << "\n";
         }
     }
 }
 
-void printASTTree(ASTNodePtr root, const std::map<std::string,std::string>& identMap)
+void printASTTree(ASTNodePtr root, const std::map<std::string,std::string>& identMap, std::ostream& out)
 {
     TreeNode* tree = buildASTTreeNode(root, identMap);
     if (!tree) return;
     layoutASTTree(tree, 0, 2);
-    renderASTTree(tree);
+    renderASTTree(tree, out);
     delete tree;
 }
 
