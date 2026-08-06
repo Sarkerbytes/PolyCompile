@@ -1,7 +1,7 @@
 
-           JAVA SYMBOL TABLE            
+           C++ SYMBOL TABLE             
 
 Scope Level | Name | Type | Kind | Params
 ----------------------------------------
-  Level 0   | main | void | Method | 
+  Level 0   | main | int | Function | 
 ========================================

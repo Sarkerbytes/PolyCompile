@@ -1,9 +1,10 @@
 main:
-print "Hello, World!\n"
-x = 10
-y = 20
-t0 = x + y
-result = t0
-t1 = "Result = " + result
-print t1
+print "Hello, World!"
+a = 5
+b = 10
+t0 = a + b
+sum = t0
+print "Sum: "
+print sum
+return 0
 return 0

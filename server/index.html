@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PolyCompile — Multi-Language Educational Compiler</title>
+  <meta name="description" content="PolyCompile: A professional multi-language educational compiler supporting C, C++, and Java with a complete 6-phase compilation pipeline featuring lexical analysis, AST, TAC, optimization, and assembly generation.">
+  <meta name="keywords" content="compiler, C, C++, Java, lexer, parser, AST, TAC, assembly, educational, polycompile">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Outfit:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ═══ NAVBAR ═══ -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-brand">
+      <div class="brand-hex">⬡</div>
+      <span class="brand-text">Poly<span class="brand-accent">Compile</span></span>
+    </div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#editor" class="nav-link" id="navEditor">IDE</a></li>
+      <li><a href="#pipeline" class="nav-link" id="navPipeline">Pipeline</a></li>
+      <li><a href="#output" class="nav-link" id="navOutput">Output</a></li>
+      <li><a href="#features" class="nav-link" id="navFeatures">Features</a></li>
+    </ul>
+    <div class="nav-right">
+      <span class="nav-version">v1.0</span>
+      <a href="https://github.com" class="nav-github" aria-label="GitHub">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      </a>
+    </div>
+  </nav>
+
+  <!-- ═══ HERO SECTION ═══ -->
+  <section class="hero" id="hero">
+    <canvas id="particleCanvas"></canvas>
+    <div class="hero-grid-overlay"></div>
+
+    <div class="hero-layout">
+      <div class="hero-content">
+        <div class="hero-badge" id="heroBadge">
+          <span class="badge-pulse"></span>
+          <span>Multi-Language Compiler</span>
+        </div>
+
+        <h1 class="hero-title" id="heroTitle">
+          <span class="title-poly">Poly</span><span class="title-compile">Compile</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          The professional compiler for
+          <span class="typewriter-wrap">
+            <span class="typewriter" id="typewriter"></span>
+            <span class="cursor">|</span>
+          </span>
+        </p>
+
+        <p class="hero-desc">
+          A complete 6-phase compilation pipeline — from lexical analysis to executable educational assembly — supporting <strong>C</strong>, <strong>C++</strong>, and <strong>Java</strong>.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#editor" class="btn-primary" id="launchIdeBtn">
+            <span class="btn-icon">▶</span>
+            <span>Launch IDE</span>
+            <div class="btn-shimmer"></div>
+          </a>
+          <a href="#pipeline" class="btn-ghost" id="explorePipelineBtn">
+            Explore Pipeline
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+
+        <div class="hero-stats" id="heroStats">
+          <div class="stat-pill">
+            <span class="stat-num" data-target="3" id="stat0">0</span>
+            <span class="stat-label">Languages</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-pill">
+            <span class="stat-num" data-target="6" id="stat1">0</span>
+            <span class="stat-label">Phases</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-pill">
+            <span class="stat-num" data-target="5" id="stat2">0</span>
+            <span class="stat-label">Optimizations</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-pill">
+            <span class="stat-num" data-target="16" id="stat3">0</span>
+            <span class="stat-label">ASM Instructions</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual" id="heroVisual">
+        <div class="code-float-card">
+          <div class="cfc-header">
+            <div class="cfc-dots">
+              <span class="dot-r"></span>
+              <span class="dot-y"></span>
+              <span class="dot-g"></span>
+            </div>
+            <span class="cfc-filename">Hello.java</span>
+            <span class="cfc-lang-badge">Java</span>
+          </div>
+          <pre class="cfc-code"><span class="kw">import</span> java.util.Scanner;
+
+<span class="kw">public class</span> <span class="cls">Hello</span> {
+  <span class="kw">public static void</span> <span class="fn">main</span>(String[] args) {
+    System.out.println(
+      <span class="str">"Hello, World!"</span>
+    );
+    <span class="kw">int</span> x = <span class="num">10</span>, y = <span class="num">20</span>;
+    <span class="kw">int</span> result = x + y;
+    System.out.println(
+      <span class="str">"Result = "</span> + result
+    );
+  }
+}</pre>
+          <div class="cfc-output">
+            <span class="cfc-output-label">▶ Output</span>
+            <span class="cfc-output-text">Hello, World!<br>Result = 30</span>
+          </div>
+        </div>
+
+        <!-- Floating phase badges -->
+        <div class="float-badge fb-lexer">🔤 Lexer</div>
+        <div class="float-badge fb-ast">🌳 AST</div>
+        <div class="float-badge fb-asm">🖥 Assembly</div>
+      </div>
+    </div>
+
+    <div class="scroll-cue" id="scrollCue">
+      <span class="scroll-text">Scroll to explore</span>
+      <div class="scroll-mouse">
+        <div class="scroll-wheel"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ INTERACTIVE IDE SECTION ═══ -->
+  <section class="ide-section" id="editor">
+    <div class="section-header">
+      <div class="section-tag" id="ideTag">Interactive IDE</div>
+      <h2 class="section-title">Write. Compile. <span class="accent-text">Explore.</span></h2>
+      <p class="section-desc">Select a language, choose your flags, and see the full compilation command.</p>
+    </div>
+
+    <div class="ide-container">
+      <!-- Language Selector -->
+      <div class="lang-selector">
+        <button class="lang-tab active" data-lang="java" id="tab-java">
+          <span class="ltab-icon">☕</span>
+          <span class="ltab-name">Java</span>
+        </button>
+        <button class="lang-tab" data-lang="cpp" id="tab-cpp">
+          <span class="ltab-icon">⚙</span>
+          <span class="ltab-name">C++</span>
+        </button>
+        <button class="lang-tab" data-lang="c" id="tab-c">
+          <span class="ltab-icon">🔷</span>
+          <span class="ltab-name">C</span>
+        </button>
+      </div>
+
+      <div class="ide-body">
+        <!-- Editor Panel -->
+        <div class="editor-panel">
+          <div class="editor-topbar">
+            <div class="etb-dots">
+              <span></span><span></span><span></span>
+            </div>
+            <span class="etb-filename" id="editorFilename">Hello.java</span>
+            <div class="etb-badge" id="editorLangBadge">Java</div>
+          </div>
+          <div class="editor-body">
+            <div class="line-numbers" id="lineNumbers">1</div>
+            <textarea
+              class="code-editor"
+              id="codeEditor"
+              spellcheck="false"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+            ></textarea>
+          </div>
+          <!-- New Footer for Compile Button -->
+          <div class="editor-footer" style="padding: 16px; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: flex-end; gap: 12px; background: rgba(0,0,0,0.15);">
+            <button class="compile-btn" id="compileBtn" style="max-width: 280px;">
+              <div class="compile-bg"></div>
+              <span class="compile-icon" id="compileBtnIcon">▶</span>
+              <span class="compile-label" id="compileBtnLabel">Compile &amp; Run</span>
+              <div class="compile-particles" id="compileParticles"></div>
+            </button>
+            <div class="compile-status" id="compileStatus" style="width: auto;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ 6-PHASE PIPELINE ═══ -->
+  <section class="pipeline-section" id="pipeline">
+    <div class="pipeline-bg-glow"></div>
+    <div class="section-header">
+      <div class="section-tag" id="pipelineTag">Architecture</div>
+      <h2 class="section-title">6-Phase <span class="accent-text">Compilation Pipeline</span></h2>
+      <p class="section-desc">Every source file flows through six carefully orchestrated phases — from raw characters to executable instructions.</p>
+    </div>
+
+    <div class="pipeline-wrapper">
+      <div class="pipeline-track">
+        <div class="pipeline-progress" id="pipelineProgress"></div>
+      </div>
+
+      <div class="phases-grid" id="phasesGrid">
+        <div class="phase-card" data-phase="1" id="phase1">
+          <div class="pc-number">01</div>
+          <div class="pc-icon-wrap"><span class="pc-icon">🔤</span></div>
+          <div class="pc-name">Lexical Analysis</div>
+          <div class="pc-desc">Tokenizes source code into typed lexemes with precise line &amp; column info</div>
+          <div class="pc-out">→ Token Stream</div>
+          <div class="pc-glow"></div>
+        </div>
+        <div class="phase-card" data-phase="2" id="phase2">
+          <div class="pc-number">02</div>
+          <div class="pc-icon-wrap"><span class="pc-icon">🌳</span></div>
+          <div class="pc-name">Syntax Analysis</div>
+          <div class="pc-desc">Recursive-descent parser constructs a full Abstract Syntax Tree</div>
+          <div class="pc-out">→ AST</div>
+          <div class="pc-glow"></div>
+        </div>
+        <div class="phase-card" data-phase="3" id="phase3">
+          <div class="pc-number">03</div>
+          <div class="pc-icon-wrap"><span class="pc-icon">🔍</span></div>
+          <div class="pc-name">Semantic Analysis</div>
+          <div class="pc-desc">Type checking, symbol resolution, and scope validation across all languages</div>
+          <div class="pc-out">→ Typed AST</div>
+          <div class="pc-glow"></div>
+        </div>
+        <div class="phase-card" data-phase="4" id="phase4">
+          <div class="pc-number">04</div>
+          <div class="pc-icon-wrap"><span class="pc-icon">⚡</span></div>
+          <div class="pc-name">IR Generation</div>
+          <div class="pc-desc">Generates Three Address Code intermediate representation from the AST</div>
+          <div class="pc-out">→ TAC</div>
+          <div class="pc-glow"></div>
+        </div>
+        <div class="phase-card" data-phase="5" id="phase5">
+          <div class="pc-number">05</div>
+          <div class="pc-icon-wrap"><span class="pc-icon">🚀</span></div>
+          <div class="pc-name">Optimization</div>
+          <div class="pc-desc">5 consecutive optimization passes eliminate dead code and fold constants</div>
+          <div class="pc-out">→ Optimized TAC</div>
+          <div class="pc-glow"></div>
+        </div>
+        <div class="phase-card" data-phase="6" id="phase6">
+          <div class="pc-number">06</div>
+          <div class="pc-icon-wrap"><span class="pc-icon">🖥</span></div>
+          <div class="pc-name">Code Generation</div>
+          <div class="pc-desc">Translates optimized TAC into educational target assembly instructions</div>
+          <div class="pc-out">→ Assembly</div>
+          <div class="pc-glow"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pipeline-actions">
+      <button class="animate-btn" id="animatePipelineBtn">
+        <span id="animBtnIcon">▶</span> Animate Pipeline
+      </button>
+      <button class="reset-btn" id="resetPipelineBtn">↺ Reset</button>
+    </div>
+  </section>
+
+  <!-- ═══ OUTPUT PANELS ═══ -->
+  <section class="output-section" id="output">
+    <div class="section-header">
+      <div class="section-tag" id="outputTag">Compiler Output</div>
+      <h2 class="section-title">Every Phase. <span class="accent-text">Fully Visible.</span></h2>
+      <p class="section-desc">Inspect every artifact produced during compilation — from raw tokens to final assembly.</p>
+    </div>
+
+    <div class="output-container">
+      <div class="output-tabs" id="outputTabs" role="tablist">
+        <button class="otab active" data-tab="tokens" id="otab-tokens" role="tab">Tokens</button>
+        <button class="otab" data-tab="ast" id="otab-ast" role="tab">AST</button>
+        <button class="otab" data-tab="symbols" id="otab-symbols" role="tab">Symbol Table</button>
+        <button class="otab" data-tab="tac" id="otab-tac" role="tab">TAC</button>
+        <button class="otab" data-tab="opt" id="otab-opt" role="tab">Opt. TAC</button>
+        <button class="otab" data-tab="asm" id="otab-asm" role="tab">Assembly</button>
+        <button class="otab" data-tab="exec" id="otab-exec" role="tab">Execution</button>
+      </div>
+
+      <div class="output-panel">
+        <div class="op-toolbar">
+          <div class="op-file-info">
+            <span class="op-file-icon">📄</span>
+            <span class="op-file-label" id="opFileLabel">output/tokens.txt</span>
+          </div>
+          <button class="copy-btn" id="copyOutputBtn" aria-label="Copy to clipboard">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <span id="copyBtnText">Copy</span>
+          </button>
+        </div>
+        <div class="op-body">
+          <pre class="op-pre" id="outputContent" role="tabpanel"></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FEATURES / OPTIMIZATIONS ═══ -->
+  <section class="features-section" id="features">
+    <div class="section-header">
+      <div class="section-tag" id="featuresTag">Optimizations</div>
+      <h2 class="section-title">5 Optimization <span class="accent-text">Passes</span></h2>
+      <p class="section-desc">PolyCompile performs 5 consecutive passes on the Three Address Code to produce leaner, faster programs.</p>
+    </div>
+
+    <div class="opt-grid">
+      <div class="opt-card" id="oc1">
+        <div class="oc-num">01</div>
+        <div class="oc-title">Constant Folding</div>
+        <div class="oc-demo">
+          <div class="oc-before">
+            <div class="oc-badge before-badge">Before</div>
+            <code>t1 = 5 + 3</code>
+          </div>
+          <div class="oc-arrow">→</div>
+          <div class="oc-after">
+            <div class="oc-badge after-badge">After</div>
+            <code>t1 = 8</code>
+          </div>
+        </div>
+        <p class="oc-desc">Evaluates constant expressions at compile time, eliminating runtime arithmetic.</p>
+      </div>
+
+      <div class="opt-card" id="oc2">
+        <div class="oc-num">02</div>
+        <div class="oc-title">Constant Propagation</div>
+        <div class="oc-demo">
+          <div class="oc-before">
+            <div class="oc-badge before-badge">Before</div>
+            <code>x = 10; y = x + 2</code>
+          </div>
+          <div class="oc-arrow">→</div>
+          <div class="oc-after">
+            <div class="oc-badge after-badge">After</div>
+            <code>y = 12</code>
+          </div>
+        </div>
+        <p class="oc-desc">Replaces variables with their known constant values throughout the code.</p>
+      </div>
+
+      <div class="opt-card" id="oc3">
+        <div class="oc-num">03</div>
+        <div class="oc-title">Copy Propagation</div>
+        <div class="oc-demo">
+          <div class="oc-before">
+            <div class="oc-badge before-badge">Before</div>
+            <code>x = y; z = x + 1</code>
+          </div>
+          <div class="oc-arrow">→</div>
+          <div class="oc-after">
+            <div class="oc-badge after-badge">After</div>
+            <code>z = y + 1</code>
+          </div>
+        </div>
+        <p class="oc-desc">Replaces unnecessary copy assignments with their original source variables.</p>
+      </div>
+
+      <div class="opt-card" id="oc4">
+        <div class="oc-num">04</div>
+        <div class="oc-title">Algebraic Simplification</div>
+        <div class="oc-demo">
+          <div class="oc-before">
+            <div class="oc-badge before-badge">Before</div>
+            <code>x * 1, x + 0, x * 0</code>
+          </div>
+          <div class="oc-arrow">→</div>
+          <div class="oc-after">
+            <div class="oc-badge after-badge">After</div>
+            <code>x, x, 0</code>
+          </div>
+        </div>
+        <p class="oc-desc">Applies algebraic identities to simplify redundant expressions.</p>
+      </div>
+
+      <div class="opt-card" id="oc5">
+        <div class="oc-num">05</div>
+        <div class="oc-title">Dead Code Elimination</div>
+        <div class="oc-demo">
+          <div class="oc-before">
+            <div class="oc-badge before-badge">Before</div>
+            <code>t_unused = x * 2</code>
+          </div>
+          <div class="oc-arrow">→</div>
+          <div class="oc-after">
+            <div class="oc-badge after-badge">After</div>
+            <code class="removed">// removed</code>
+          </div>
+        </div>
+        <p class="oc-desc">Removes instructions whose results are never used in the program.</p>
+      </div>
+    </div>
+
+    <!-- Language Support Matrix -->
+    <div class="matrix-wrapper" id="matrixWrapper">
+      <div class="section-tag" style="margin-bottom:2rem;">Language Support Matrix</div>
+      <div class="matrix-table">
+        <div class="matrix-head">
+          <div class="mc feature-col">Feature</div>
+          <div class="mc c-col">C</div>
+          <div class="mc cpp-col">C++</div>
+          <div class="mc java-col">Java</div>
+        </div>
+        <div class="matrix-row"><div class="mc feature-col">Lexical Analysis</div><div class="mc c-col chk">✓</div><div class="mc cpp-col chk">✓</div><div class="mc java-col chk">✓</div></div>
+        <div class="matrix-row"><div class="mc feature-col">Recursive Descent Parser</div><div class="mc c-col chk">✓</div><div class="mc cpp-col chk">✓</div><div class="mc java-col chk">✓</div></div>
+        <div class="matrix-row"><div class="mc feature-col">Scoped Symbol Table</div><div class="mc c-col chk">✓</div><div class="mc cpp-col chk">✓</div><div class="mc java-col chk">✓</div></div>
+        <div class="matrix-row"><div class="mc feature-col">Semantic Analysis</div><div class="mc c-col chk">✓</div><div class="mc cpp-col chk">✓</div><div class="mc java-col chk">✓</div></div>
+        <div class="matrix-row"><div class="mc feature-col">AST Generation</div><div class="mc c-col chk">✓</div><div class="mc cpp-col chk">✓</div><div class="mc java-col chk">✓</div></div>
+        <div class="matrix-row"><div class="mc feature-col">IR / TAC Generation</div><div class="mc c-col chk">✓</div><div class="mc cpp-col chk">✓</div><div class="mc java-col chk">✓</div></div>
+        <div class="matrix-row"><div class="mc feature-col">5-Pass Optimizer</div><div class="mc c-col chk">✓</div><div class="mc cpp-col chk">✓</div><div class="mc java-col chk">✓</div></div>
+        <div class="matrix-row"><div class="mc feature-col">Assembly Code Gen</div><div class="mc c-col chk">✓</div><div class="mc cpp-col chk">✓</div><div class="mc java-col chk">✓</div></div>
+        <div class="matrix-row"><div class="mc feature-col">Virtual Executor</div><div class="mc c-col chk">✓</div><div class="mc cpp-col chk">✓</div><div class="mc java-col chk">✓</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ ASM INSTRUCTIONS SHOWCASE ═══ -->
+  <section class="asm-section" id="asmSection">
+    <div class="asm-bg"></div>
+    <div class="section-header">
+      <div class="section-tag">Target Architecture</div>
+      <h2 class="section-title">Educational <span class="accent-text">Assembly</span> Instruction Set</h2>
+      <p class="section-desc">16 handcrafted instructions designed for clarity and teaching — from data movement to control flow.</p>
+    </div>
+
+    <div class="asm-grid" id="asmGrid">
+      <div class="asm-chip" data-desc="Move a value into a register" id="ac-MOV">MOV</div>
+      <div class="asm-chip" data-desc="Load a value from memory into a register" id="ac-LOAD">LOAD</div>
+      <div class="asm-chip" data-desc="Store a register value into memory" id="ac-STORE">STORE</div>
+      <div class="asm-chip" data-desc="Add two register operands" id="ac-ADD">ADD</div>
+      <div class="asm-chip" data-desc="Subtract two register operands" id="ac-SUB">SUB</div>
+      <div class="asm-chip" data-desc="Multiply two register operands" id="ac-MUL">MUL</div>
+      <div class="asm-chip" data-desc="Divide two register operands" id="ac-DIV">DIV</div>
+      <div class="asm-chip" data-desc="Compare two operands and set flags" id="ac-CMP">CMP</div>
+      <div class="asm-chip" data-desc="Unconditional jump to a label" id="ac-JMP">JMP</div>
+      <div class="asm-chip" data-desc="Jump if comparison result is equal" id="ac-JMP_EQ">JMP_EQ</div>
+      <div class="asm-chip" data-desc="Jump if comparison result is not equal" id="ac-JMP_NE">JMP_NE</div>
+      <div class="asm-chip" data-desc="Push a value onto the stack" id="ac-PUSH">PUSH</div>
+      <div class="asm-chip" data-desc="Call a function and save return address" id="ac-CALL">CALL</div>
+      <div class="asm-chip" data-desc="Return from a function call" id="ac-RET">RET</div>
+      <div class="asm-chip" data-desc="Read input from standard input" id="ac-READ">READ</div>
+      <div class="asm-chip" data-desc="Print a value to standard output" id="ac-PRINT">PRINT</div>
+    </div>
+
+    <div class="asm-tooltip-box" id="asmTooltip"></div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer class="footer" id="footer">
+    <div class="footer-grid-bg"></div>
+    <div class="footer-content">
+      <div class="footer-brand">
+        <div class="brand-hex large">⬡</div>
+        <span class="brand-text large">Poly<span class="brand-accent">Compile</span></span>
+      </div>
+      <p class="footer-tagline">A Professional Multi-Language Educational Compiler</p>
+      <div class="footer-chips">
+        <span class="fchip c-chip">C</span>
+        <span class="fchip cpp-chip">C++</span>
+        <span class="fchip java-chip">Java</span>
+        <span class="fchip">6-Phase Pipeline</span>
+        <span class="fchip">5 Optimizations</span>
+        <span class="fchip">Educational Assembly</span>
+      </div>
+      <div class="footer-meta">
+        <span>MIT License</span>
+        <span class="footer-dot">·</span>
+        <span>Built with g++ and GNU Make</span>
+        <span class="footer-dot">·</span>
+        <span>PolyCompile v1.0</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

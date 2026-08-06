@@ -1,20 +1,22 @@
 
-          JAVA ABSTRACT SYNTAX TREE     
+           C++ ABSTRACT SYNTAX TREE     
 
 ProgramNode:
-  FunctionNode: void main()
+  FunctionNode: int main()
     BlockNode:
       OutputNode (newline=true):
-        LiteralNode (string): "Hello, World!\n"
-      VarDeclNode: int x =
-        LiteralNode (int): 10
-      VarDeclNode: int y =
-        LiteralNode (int): 20
-      VarDeclNode: int result =
+        LiteralNode (string): "Hello, World!"
+      VarDeclListNode:
+        VarDeclNode: int a =
+          LiteralNode (int): 5
+        VarDeclNode: int b =
+          LiteralNode (int): 10
+      VarDeclNode: int sum =
         BinaryExprNode: (+)
-          VarExprNode: x
-          VarExprNode: y
+          VarExprNode: a
+          VarExprNode: b
       OutputNode (newline=true):
-        BinaryExprNode: (+)
-          LiteralNode (string): "Result = "
-          VarExprNode: result
+        LiteralNode (string): "Sum: "
+        VarExprNode: sum
+      ReturnNode:
+        LiteralNode (int): 0

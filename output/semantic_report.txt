@@ -1,8 +1,5 @@
-JAVA SEMANTIC ANALYSIS REPORT
-------------------------------
-Main method found: void main(String[] args)
-Java Method declared: void main
-Java Variable declared: int x
-Java Variable declared: int y
-Java Variable declared: int result
+C++ SEMANTIC ANALYSIS REPORT
+----------------------------
+C++ Function declared: int main
+C++ Variable declared: int sum
 Semantic analysis completed with 0 errors.

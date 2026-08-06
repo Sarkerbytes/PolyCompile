@@ -1,4 +1,5 @@
-#include "Frontend_C.hpp"
+﻿#include "Frontend_C.hpp"
+#include "../../common/Utilities/DiagnosticEngine.hpp"
 #include "../../common/Utilities/ASTParser.hpp"
 #include <fstream>
 #include <sstream>
@@ -52,7 +53,7 @@ bool Frontend_C::runLexer(const std::string& outputTokensPath) {
                     std::string sub2 = lineStr.substr(i, 2);
                     if (sub2 == "<=" || sub2 == ">=" || sub2 == "==" || sub2 == "!=" ||
                         sub2 == "++" || sub2 == "--" || sub2 == "&&" || sub2 == "||" ||
-                        sub2 == "+=" || sub2 == "-=" || sub2 == "*=" || sub2 == "/=") {
+                        sub2 == "+=" || sub2 == "-=" || sub2 == "*=" || sub2 == "/=" || sub2 == "<<" || sub2 == ">>") {
                         op = sub2;
                         i += 2;
                     }
@@ -87,6 +88,7 @@ bool Frontend_C::runParser(const std::string& outputASTPath) {
     ASTParser parser(tokens);
     astRoot = parser.parseProgram();
 
+    if (DiagnosticEngine::hasErrors()) return false;
     if (astRoot) {
         AST_C::saveToFile(astRoot, outputASTPath);
         return true;

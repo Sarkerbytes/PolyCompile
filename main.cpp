@@ -1,4 +1,4 @@
-/*
+﻿/*
  * ============================================================
  *  PolyCompiler - Professional Multi-Language Compiler
  *  Supports: C, C++, and Java subsets
@@ -119,9 +119,7 @@ int main(int argc, char* argv[]) {
         frontend.runLexer(tokensPath);
         tokens = frontend.getTokens();
 
-        frontend.runParser(astPath);
-        astRoot = frontend.getAST();
-        if (!astRoot) frontendOK = false;
+        if (!frontend.runParser(astPath)) frontendOK = false; astRoot = frontend.getAST(); if (!astRoot) frontendOK = false;
 
         if (frontendOK) {
             bool semOK = frontend.runSemantic(symTablePath, reportPath);
@@ -134,9 +132,7 @@ int main(int argc, char* argv[]) {
         frontend.runLexer(tokensPath);
         tokens = frontend.getTokens();
 
-        frontend.runParser(astPath);
-        astRoot = frontend.getAST();
-        if (!astRoot) frontendOK = false;
+        if (!frontend.runParser(astPath)) frontendOK = false; astRoot = frontend.getAST(); if (!astRoot) frontendOK = false;
 
         if (frontendOK) {
             bool semOK = frontend.runSemantic(symTablePath, reportPath);
@@ -149,9 +145,7 @@ int main(int argc, char* argv[]) {
         frontend.runLexer(tokensPath);
         tokens = frontend.getTokens();
 
-        frontend.runParser(astPath);
-        astRoot = frontend.getAST();
-        if (!astRoot) frontendOK = false;
+        if (!frontend.runParser(astPath)) frontendOK = false; astRoot = frontend.getAST(); if (!astRoot) frontendOK = false;
 
         if (frontendOK) {
             bool semOK = frontend.runSemantic(symTablePath, reportPath);
@@ -666,15 +660,15 @@ static void renderASTTree(TreeNode* root)
             for (auto* n : level) {
                 for (auto* child : n->children) {
                     if (child->col < n->col) {
-                        // child is to the LEFT  → draw '/'
+                        // child is to the LEFT  â†’ draw '/'
                         int pos = (child->col + n->col) / 2;
                         if (pos >= 0 && pos < (int)connRow.size()) connRow[pos] = '/';
                     } else if (child->col > n->col) {
-                        // child is to the RIGHT → draw '\'
+                        // child is to the RIGHT â†’ draw '\'
                         int pos = (child->col + n->col + 1) / 2;
                         if (pos >= 0 && pos < (int)connRow.size()) connRow[pos] = '\\';
                     } else {
-                        // child is directly below → draw '|'
+                        // child is directly below â†’ draw '|'
                         if (n->col < (int)connRow.size()) connRow[n->col] = '|';
                     }
                 }

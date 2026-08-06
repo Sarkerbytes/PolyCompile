@@ -7,6 +7,7 @@
 #include <iostream>
 #include "../Token/Token.hpp"
 #include "ASTBase.hpp"
+#include "DiagnosticEngine.hpp"
 
 class ASTParser {
 private:
@@ -36,7 +37,17 @@ private:
         return false;
     }
 
-    bool isAtEnd() const {
+    
+    bool expect(const std::string& lexeme) {
+        if (check(lexeme)) {
+            advance();
+            return true;
+        }
+        Token t = peek();
+        DiagnosticEngine::logSyntaxError("source", t.line, t.column, "expected '" + lexeme + "' but found '" + t.lexeme + "'");
+        return false;
+    }
+bool isAtEnd() const {
         return pos >= tokens.size() || peek().type == TokenType::END_OF_FILE;
     }
 
@@ -51,8 +62,38 @@ public:
             Token t = peek();
 
             // Skip preprocessor, import, package, using
-            if (t.lexeme == "#include" || t.lexeme.find("#include") == 0 || t.lexeme == "import" || t.lexeme == "using" || t.lexeme == "package") {
-                while (!isAtEnd() && peek().lexeme != ";" && peek().line == t.line) advance();
+            if (t.lexeme == "#include" || t.lexeme.find("#include") == 0) {
+                bool hasAngle = (t.lexeme.find('<') != std::string::npos && t.lexeme.find('>') != std::string::npos);
+                bool hasQuotes = (t.lexeme.find('"') != std::string::npos && t.lexeme.rfind('"') != t.lexeme.find('"'));
+                if (!hasAngle && !hasQuotes) {
+                    DiagnosticEngine::logSyntaxError("source", t.line, t.column, "invalid #include syntax, expected <...> or \"...\"");
+                }
+                while (!isAtEnd() && peek().line == t.line) advance();
+                continue;
+            }
+            if (t.lexeme == "import" || t.lexeme == "package") {
+                advance();
+                bool hasDot = false;
+                while (!isAtEnd() && peek().lexeme != ";" && peek().line == t.line) {
+                    if (peek().lexeme == ".") hasDot = true;
+                    advance();
+                }
+                if (t.lexeme == "import" && !hasDot) {
+                    DiagnosticEngine::logSyntaxError("source", t.line, t.column, "invalid import syntax, expected dotted path");
+                }
+                if (match(";")) {}
+                continue;
+            }
+            if (t.lexeme == "using") {
+                advance();
+                bool hasNamespace = false;
+                while (!isAtEnd() && peek().lexeme != ";" && peek().line == t.line) {
+                    if (peek().lexeme == "namespace") hasNamespace = true;
+                    advance();
+                }
+                if (!hasNamespace) {
+                    DiagnosticEngine::logSyntaxError("source", t.line, t.column, "invalid using syntax, expected 'namespace'");
+                }
                 if (match(";")) {}
                 continue;
             }
@@ -107,7 +148,14 @@ public:
             auto block = std::make_shared<BlockNode>();
             while (!isAtEnd()) {
                 Token t = peek();
-                if (t.lexeme == "#include" || t.lexeme.find("#include") == 0 || t.lexeme == "import" || t.lexeme == "using" || t.lexeme == "class") {
+                if (t.lexeme == "#include" || t.lexeme.find("#include") == 0) {
+                    if (t.lexeme.find('<') != std::string::npos && t.lexeme.find('>') == std::string::npos) {
+                        DiagnosticEngine::logSyntaxError("source", t.line, t.column, "missing closing '>' in #include");
+                    }
+                    while (!isAtEnd() && peek().line == t.line) advance();
+                    continue;
+                }
+                if (t.lexeme == "import" || t.lexeme == "using" || t.lexeme == "class") {
                     advance();
                     continue;
                 }
@@ -149,9 +197,7 @@ private:
 
         if (t.lexeme == "while") {
             advance();
-            match("(");
-            auto cond = parseExpression();
-            match(")");
+            expect("("); auto cond = parseExpression(); expect(")");
             ASTNodePtr body = nullptr;
             if (check("{")) {
                 match("{");
@@ -167,8 +213,7 @@ private:
 
         if (t.lexeme == "for") {
             advance();
-            match("(");
-            ASTNodePtr init = nullptr;
+            expect("("); ASTNodePtr init = nullptr;
             if (!check(";")) {
                 init = parseStatement();
             } else {
@@ -183,8 +228,7 @@ private:
             if (!check(")")) {
                 update = parseExpression();
             }
-            match(")");
-            ASTNodePtr body = nullptr;
+            expect(")"); ASTNodePtr body = nullptr;
             if (check("{")) {
                 match("{");
                 body = parseBlock();
@@ -201,9 +245,7 @@ private:
 
         if (t.lexeme == "if") {
             advance();
-            match("(");
-            auto cond = parseExpression();
-            match(")");
+            expect("("); auto cond = parseExpression(); expect(")");
             ASTNodePtr thenB = nullptr;
             if (check("{")) {
                 match("{");
@@ -229,25 +271,20 @@ private:
 
         if (t.lexeme == "switch") {
             advance();
-            match("(");
-            auto expr = parseExpression();
-            match(")");
-            match("{");
+            expect("("); auto expr = parseExpression(); expect(")"); expect("{");
             auto node = std::make_shared<SwitchNode>();
             node->expression = expr;
             while (!isAtEnd() && !check("}")) {
                 if (match("case")) {
                     SwitchCase sc;
                     sc.value = parseExpression();
-                    match(":");
-                    while (!isAtEnd() && !check("case") && !check("default") && !check("}")) {
+                    expect(":"); while (!isAtEnd() && !check("case") && !check("default") && !check("}")) {
                         auto s = parseStatement();
                         if (s) sc.body.push_back(s);
                     }
                     node->cases.push_back(sc);
                 } else if (match("default")) {
-                    match(":");
-                    while (!isAtEnd() && !check("case") && !check("}") && !check("default")) {
+                    expect(":"); while (!isAtEnd() && !check("case") && !check("}") && !check("default")) {
                         auto s = parseStatement();
                         if (s) node->defaultBody.push_back(s);
                     }
@@ -255,8 +292,7 @@ private:
                     advance();
                 }
             }
-            match("}");
-            return node;
+            expect("}"); return node;
         }
 
         if (t.lexeme == "return") {
@@ -265,21 +301,18 @@ private:
             if (!check(";")) {
                 expr = parseExpression();
             }
-            match(";");
-            auto node = std::make_shared<ReturnNode>();
+            expect(";"); auto node = std::make_shared<ReturnNode>();
             node->expr = expr;
             return node;
         }
 
         if (t.lexeme == "break") {
             advance();
-            match(";");
-            return std::make_shared<BreakNode>();
+            expect(";"); return std::make_shared<BreakNode>();
         }
         if (t.lexeme == "continue") {
             advance();
-            match(";");
-            return std::make_shared<ContinueNode>();
+            expect(";"); return std::make_shared<ContinueNode>();
         }
 
         if (t.lexeme == "printf" || t.lexeme == "cout" || t.lexeme == "System.out.println" || t.lexeme == "System.out.print" || (t.lexeme == "System" && peek(1).lexeme == "." && peek(2).lexeme == "out")) {
@@ -310,8 +343,7 @@ private:
                 if (match(",")) continue;
                 break;
             }
-            match(";");
-            if (listNode->decls.size() == 1) return listNode->decls[0];
+            expect(";"); if (listNode->decls.size() == 1) return listNode->decls[0];
             return listNode;
         }
 
@@ -320,8 +352,7 @@ private:
 
             if (check("=") || check("+=") || check("-=") || check("*=") || check("/=")) {
                 std::string op = advance().lexeme;
-                auto expr = parseExpression();
-                match(";");
+                auto expr = parseExpression(); expect(";");
                 auto ass = std::make_shared<AssignNode>();
                 ass->varName = varName;
                 ass->op = op;
@@ -330,8 +361,7 @@ private:
             }
             if (check("++") || check("--")) {
                 std::string op = advance().lexeme;
-                match(";");
-                auto un = std::make_shared<UnaryExprNode>();
+                expect(";"); auto un = std::make_shared<UnaryExprNode>();
                 un->op = (op == "++") ? "post++" : "post--";
                 un->operand = std::make_shared<VarExprNode>();
                 std::dynamic_pointer_cast<VarExprNode>(un->operand)->name = varName;
@@ -339,8 +369,7 @@ private:
             }
         }
 
-        auto expr = parseExpression();
-        match(";");
+        auto expr = parseExpression(); expect(";");
         return expr;
     }
 
@@ -349,18 +378,16 @@ private:
         Token t = advance();
 
         if (t.lexeme == "printf") {
-            match("(");
+            expect("(");
             while (!isAtEnd() && !check(")")) {
                 auto arg = parseExpression();
                 if (arg) node->args.push_back(arg);
                 if (!match(",")) break;
             }
-            match(")");
-            match(";");
-            node->hasNewline = true;
+            expect(")"); expect(";"); node->hasNewline = true;
         } else if (t.lexeme == "cout") {
             while (!isAtEnd() && !check(";")) {
-                if (match("<<")) {
+                if (expect("<<")) {
                     if (check("endl")) {
                         advance();
                         node->hasNewline = true;
@@ -369,24 +396,23 @@ private:
                         if (arg) node->args.push_back(arg);
                     }
                 } else {
-                    advance();
+                    break;
                 }
             }
-            match(";");
+            expect(";"); 
         } else {
             if (t.lexeme == "System") {
-                while (!isAtEnd() && peek().lexeme != "println" && peek().lexeme != "print" && peek().lexeme != "(") advance();
+                while (!isAtEnd() && peek().lexeme != "println" && peek().lexeme != "print" && peek().lexeme != "(" && peek().lexeme != ";") advance();
                 if (peek().lexeme == "println" || peek().lexeme == "print") t = advance();
             }
             if (t.lexeme.find("println") != std::string::npos) node->hasNewline = true;
-            match("(");
+            expect("(");
             while (!isAtEnd() && !check(")")) {
                 auto arg = parseExpression();
                 if (arg) node->args.push_back(arg);
                 if (!match("+") && !match(",")) break;
             }
-            match(")");
-            match(";");
+            expect(")"); expect(";"); 
         }
         return node;
     }
@@ -394,8 +420,7 @@ private:
     ASTNodePtr parseInput() {
         auto node = std::make_shared<InputNode>();
         Token t = advance();
-        if (t.lexeme == "scanf") {
-            match("(");
+        if (t.lexeme == "scanf") { expect("(");
             if (peek().type == TokenType::STRING_LITERAL) advance();
             while (!isAtEnd() && !check(")")) {
                 if (match(",")) {}
@@ -407,11 +432,9 @@ private:
                 }
             }
             if (!node->targetVars.empty()) node->targetVar = node->targetVars[0];
-            match(")");
-            match(";");
-        } else if (t.lexeme == "cin") {
+            expect(")"); expect(";"); } else if (t.lexeme == "cin") {
             while (!isAtEnd() && !check(";")) {
-                if (match(">>")) {
+                if (expect(">>")) {
                     if (peek().type == TokenType::IDENTIFIER) {
                         node->targetVars.push_back(advance().lexeme);
                     }
