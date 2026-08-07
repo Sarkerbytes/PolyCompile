@@ -4,4 +4,7 @@
 *.out
 node_modules/
 output/
+server/temp/
+temp/
 polycompile
+

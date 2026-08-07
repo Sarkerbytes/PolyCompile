@@ -1,7 +1,0 @@
-C++ SEMANTIC ANALYSIS REPORT
-----------------------------
-C++ Function declared: int main
-C++ Variable declared: int x
-C++ Variable declared: int y
-C++ Variable declared: int result
-Semantic analysis completed with 0 errors.
