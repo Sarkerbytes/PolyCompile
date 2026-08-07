@@ -1,11 +1,3 @@
-/*
- * ============================================================
- *  PolyCompiler - Professional Multi-Language Compiler
- *  Supports: C, C++, and Java subsets
- *  Pipeline: Lexer -> Parser -> Semantic -> IR -> Optimizer -> CodeGen -> Executor
- *  Author: PolyCompile Team
- * ============================================================
- */
 
 #include <iostream>
 #include <string>
@@ -53,7 +45,7 @@ void printTACColumnar(const std::vector<TACInstruction>& tac, bool showOrigExpr)
 // 
 int main(int argc, char* argv[]) {
 
-    // --- Parse arguments ---
+    //  Parse arguments 
     bool debugMode     = false;
     bool showTokens    = false;
     bool showAST       = false;
@@ -82,13 +74,13 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // --- Read source file ---
+    // Read source file 
     std::string sourceCode = FileReader::read(sourceFile);
     if (sourceCode.empty() && DiagnosticEngine::hasErrors()) {
         return 1;
     }
 
-    // --- Detect language ---
+    //Detect language 
     Language lang = LanguageDetector::detect(sourceFile);
     if (lang == Language::UNKNOWN) {
         std::cerr << "PolyCompiler Error: Cannot determine language from file extension: " << sourceFile << "\n";
@@ -683,7 +675,7 @@ static void renderASTTree(TreeNode* root, std::ostream& out)
         }
         out << rowIndent << labelRow << "\n";
 
-        // --- Connector row (only between levels) ---
+        // Connector row (only between levels) 
         if (lvl + 1 < levels.size()) {
             std::string connRow(rowWidth, ' ');
             for (auto* n : level) {

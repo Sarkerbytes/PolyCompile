@@ -28,16 +28,16 @@ void yyerror(const char* msg) {
 
 %}
 
-/* ------------------------------------------------------------------ */
+
 /*  Value types                                                         */
-/* ------------------------------------------------------------------ */
+
 %union {
     char* string_val;
 }
 
-/* ------------------------------------------------------------------ */
+
 /*  Token declarations                                                  */
-/* ------------------------------------------------------------------ */
+
 
 /* Preprocessor */
 %token <string_val> HEADER_DIRECTIVE
@@ -105,18 +105,18 @@ void yyerror(const char* msg) {
 %token SEMICOLON COMMA COLON DOT
 %token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET
 
-/* ------------------------------------------------------------------ */
+
 /*  Non-terminal types                                                  */
-/* ------------------------------------------------------------------ */
+
 %type <string_val> type_specifier
 %type <string_val> expression assignment_expr logical_or_expr logical_and_expr
 %type <string_val> equality_expr relational_expr additive_expr multiplicative_expr
 %type <string_val> unary_expr postfix_expr primary_expr
 %type <string_val> argument_list stream_output_chain
 
-/* ------------------------------------------------------------------ */
+*/
 /*  Operator precedence                                                 */
-/* ------------------------------------------------------------------ */
+
 %right ASSIGN OP_PLUS_ASSIGN OP_MINUS_ASSIGN OP_MUL_ASSIGN OP_DIV_ASSIGN
 %left  OP_OR
 %left  OP_AND
@@ -132,9 +132,9 @@ void yyerror(const char* msg) {
 
 %%
 
-/* ================================================================== */
+
 /*  TOP LEVEL                                                           */
-/* ================================================================== */
+
 
 program
     : declaration_list
@@ -154,23 +154,23 @@ declaration
     | var_declaration
     ;
 
-/* ------------------------------------------------------------------ */
+
 header_directive
     : HEADER_DIRECTIVE
         { printf("[Token] Include: %s\n", $1); free($1); }
     ;
 
-/* ------------------------------------------------------------------ */
+
 /*  using namespace std;                                                */
-/* ------------------------------------------------------------------ */
+
 using_directive
     : KEYWORD_USING KEYWORD_NAMESPACE IDENTIFIER SEMICOLON
         { printf("[Decl] using namespace %s;\n", $3); free($3); }
     ;
 
-/* ================================================================== */
+
 /*  CLASS DEFINITION                                                    */
-/* ================================================================== */
+
 class_definition
     : KEYWORD_CLASS IDENTIFIER LBRACE class_body RBRACE SEMICOLON
         { printf("[Class] class %s { ... };\n", $2); free($2); }
@@ -206,9 +206,8 @@ class_member_item
     | var_declaration
     ;
 
-/* ================================================================== */
 /*  TYPE SPECIFIER                                                      */
-/* ================================================================== */
+
 type_specifier
     : KEYWORD_INT    { $$ = $1; }
     | KEYWORD_FLOAT  { $$ = $1; }
@@ -222,9 +221,8 @@ type_specifier
     | IDENTIFIER     { $$ = $1; }   /* user-defined types / class names */
     ;
 
-/* ================================================================== */
 /*  VARIABLE DECLARATION                                                */
-/* ================================================================== */
+
 var_declaration
     : type_specifier var_init_list SEMICOLON
         { printf("[Decl] Variable: type=%s\n", $1); }
@@ -246,9 +244,8 @@ var_init
         { free($1); }
     ;
 
-/* ================================================================== */
 /*  FUNCTION DEFINITION                                                 */
-/* ================================================================== */
+
 function_definition
     : type_specifier IDENTIFIER LPAREN param_list RPAREN compound_statement
         { printf("[Func] %s %s(...)\n", $1, $2); free($1); free($2); }
@@ -281,9 +278,9 @@ param
         { free($1); }
     ;
 
-/* ================================================================== */
+
 /*  COMPOUND STATEMENT                                                  */
-/* ================================================================== */
+
 compound_statement
     : LBRACE statement_list RBRACE
     | LBRACE RBRACE
@@ -294,9 +291,9 @@ statement_list
     | statement_list statement
     ;
 
-/* ================================================================== */
+
 /*  STATEMENTS                                                          */
-/* ================================================================== */
+
 statement
     : var_declaration
     | expression_statement
@@ -318,9 +315,9 @@ expression_statement
     | SEMICOLON
     ;
 
-/* ------------------------------------------------------------------ */
+
 /*  IF / ELSE                                                           */
-/* ------------------------------------------------------------------ */
+
 if_statement
     : KEYWORD_IF LPAREN expression RPAREN statement
         { printf("[Stmt] if (%s)\n", $3); free($3); }
@@ -328,9 +325,9 @@ if_statement
         { printf("[Stmt] if-else (%s)\n", $3); free($3); }
     ;
 
-/* ------------------------------------------------------------------ */
+
 /*  SWITCH                                                              */
-/* ------------------------------------------------------------------ */
+
 switch_statement
     : KEYWORD_SWITCH LPAREN expression RPAREN LBRACE case_list RBRACE
         { printf("[Stmt] switch (%s)\n", $3); free($3); }
@@ -348,7 +345,6 @@ case_clause
     | KEYWORD_DEFAULT COLON
     ;
 
-/* ------------------------------------------------------------------ */
 while_statement
     : KEYWORD_WHILE LPAREN expression RPAREN statement
         { printf("[Stmt] while (%s)\n", $3); free($3); }
@@ -359,7 +355,6 @@ do_while_statement
         { printf("[Stmt] do-while (%s)\n", $5); free($5); }
     ;
 
-/* ------------------------------------------------------------------ */
 for_statement
     : KEYWORD_FOR LPAREN for_init SEMICOLON for_cond SEMICOLON for_update RPAREN statement
         { printf("[Stmt] for(...)\n"); }
@@ -388,9 +383,9 @@ for_update
     | /* empty */
     ;
 
-/* ------------------------------------------------------------------ */
+
 /*  cout << expr << endl;                                               */
-/* ------------------------------------------------------------------ */
+
 cout_statement
     : KEYWORD_COUT STREAM_OUT stream_output_chain SEMICOLON
         { printf("[Stmt] cout << ...\n"); free($3); }
@@ -407,9 +402,9 @@ stream_output_chain
         { $$ = $1; }
     ;
 
-/* ------------------------------------------------------------------ */
+
 /*  cin >> var;                                                         */
-/* ------------------------------------------------------------------ */
+
 cin_statement
     : KEYWORD_CIN STREAM_IN cin_input_chain SEMICOLON
         { printf("[Stmt] cin >> ...\n"); }
@@ -420,7 +415,7 @@ cin_input_chain
     | cin_input_chain STREAM_IN IDENTIFIER { free($3); }
     ;
 
-/* ------------------------------------------------------------------ */
+
 return_statement
     : KEYWORD_RETURN expression SEMICOLON
         { printf("[Stmt] return %s\n", $2); free($2); }
@@ -431,9 +426,9 @@ return_statement
 break_statement    : KEYWORD_BREAK SEMICOLON    { printf("[Stmt] break;\n"); } ;
 continue_statement : KEYWORD_CONTINUE SEMICOLON { printf("[Stmt] continue;\n"); } ;
 
-/* ================================================================== */
+
 /*  EXPRESSIONS                                                         */
-/* ================================================================== */
+
 
 expression
     : assignment_expr { $$ = $1; }
@@ -540,7 +535,7 @@ argument_list
 
 %%
 
-/* ------------------------------------------------------------------ */
+
 /*  Standalone test driver                                              */
 /*  Compile:  bison -d -o parser_cpp.tab.c parser_cpp.y               */
 /*            flex  -o lex.yy_cpp.c lexer_cpp.l                       */

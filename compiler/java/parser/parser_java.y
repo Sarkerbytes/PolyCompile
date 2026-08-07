@@ -28,16 +28,16 @@ void yyerror(const char* msg) {
 
 %}
 
-/* ------------------------------------------------------------------ */
+
 /*  Value types                                                         */
-/* ------------------------------------------------------------------ */
+
 %union {
     char* string_val;
 }
 
-/* ------------------------------------------------------------------ */
+
 /*  Token declarations                                                  */
-/* ------------------------------------------------------------------ */
+
 
 /* Annotation */
 %token <string_val> ANNOTATION
@@ -111,18 +111,18 @@ void yyerror(const char* msg) {
 %token SEMICOLON COMMA COLON DOT
 %token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET
 
-/* ------------------------------------------------------------------ */
+
 /*  Non-terminal types                                                  */
-/* ------------------------------------------------------------------ */
+
 %type <string_val> type_specifier
 %type <string_val> expression assignment_expr logical_or_expr logical_and_expr
 %type <string_val> equality_expr relational_expr additive_expr multiplicative_expr
 %type <string_val> unary_expr postfix_expr primary_expr
 %type <string_val> argument_list
 
-/* ------------------------------------------------------------------ */
+
 /*  Operator precedence                                                 */
-/* ------------------------------------------------------------------ */
+
 %right ASSIGN OP_PLUS_ASSIGN OP_MINUS_ASSIGN OP_MUL_ASSIGN OP_DIV_ASSIGN
 %left  OP_OR
 %left  OP_AND
@@ -137,9 +137,9 @@ void yyerror(const char* msg) {
 
 %%
 
-/* ================================================================== */
+
 /*  TOP LEVEL  – Java file = optional package + imports + class decls  */
-/* ================================================================== */
+
 
 program
     : class_list
@@ -151,9 +151,8 @@ class_list
     | class_list class_declaration
     ;
 
-/* ================================================================== */
 /*  CLASS DECLARATION                                                   */
-/* ================================================================== */
+
 
 class_declaration
     : annotation_list modifiers KEYWORD_CLASS IDENTIFIER class_body
@@ -208,9 +207,9 @@ class_member
     | annotation_list modifiers constructor_definition
     ;
 
-/* ================================================================== */
+
 /*  FIELD DECLARATION                                                   */
-/* ================================================================== */
+
 
 field_declaration
     : type_specifier var_init_list SEMICOLON
@@ -219,9 +218,9 @@ field_declaration
         { printf("[Field] array type=%s\n", $1); }
     ;
 
-/* ================================================================== */
+
 /*  CONSTRUCTOR                                                         */
-/* ================================================================== */
+
 
 constructor_definition
     : IDENTIFIER LPAREN param_list RPAREN compound_statement
@@ -230,9 +229,9 @@ constructor_definition
         { printf("[Constructor] %s()\n", $1); free($1); }
     ;
 
-/* ================================================================== */
+
 /*  METHOD DEFINITION                                                   */
-/* ================================================================== */
+
 
 method_definition
     : type_specifier IDENTIFIER LPAREN param_list RPAREN compound_statement
@@ -252,9 +251,9 @@ method_definition
         { printf("[Method] abstract/interface: %s %s()\n", $1, $2); free($1); free($2); }
     ;
 
-/* ================================================================== */
+
 /*  PARAMETERS                                                          */
-/* ================================================================== */
+
 
 param_list
     : param
@@ -270,9 +269,8 @@ param
         { free($1); }
     ;
 
-/* ================================================================== */
 /*  TYPE SPECIFIER                                                      */
-/* ================================================================== */
+
 
 type_specifier
     : KEYWORD_INT     { $$ = $1; }
@@ -288,9 +286,9 @@ type_specifier
     | IDENTIFIER      { $$ = $1; }  /* user-defined class type */
     ;
 
-/* ================================================================== */
+
 /*  VARIABLE DECLARATION (inside methods)                               */
-/* ================================================================== */
+
 
 var_declaration
     : type_specifier var_init_list SEMICOLON
@@ -315,9 +313,9 @@ var_init
         { free($1); free($5); }
     ;
 
-/* ================================================================== */
+
 /*  COMPOUND STATEMENT                                                  */
-/* ================================================================== */
+
 
 compound_statement
     : LBRACE statement_list RBRACE
@@ -329,9 +327,9 @@ statement_list
     | statement_list statement
     ;
 
-/* ================================================================== */
+
 /*  STATEMENTS                                                          */
-/* ================================================================== */
+
 
 statement
     : var_declaration
@@ -356,9 +354,9 @@ expression_statement
     | SEMICOLON
     ;
 
-/* ------------------------------------------------------------------ */
+
 /*  IF / ELSE                                                           */
-/* ------------------------------------------------------------------ */
+
 if_statement
     : KEYWORD_IF LPAREN expression RPAREN statement
         { printf("[Stmt] if (%s)\n", $3); free($3); }
@@ -366,9 +364,9 @@ if_statement
         { printf("[Stmt] if-else (%s)\n", $3); free($3); }
     ;
 
-/* ------------------------------------------------------------------ */
+
 /*  SWITCH                                                              */
-/* ------------------------------------------------------------------ */
+
 switch_statement
     : KEYWORD_SWITCH LPAREN expression RPAREN LBRACE case_list RBRACE
         { printf("[Stmt] switch (%s)\n", $3); free($3); }
@@ -386,7 +384,7 @@ case_clause
     | KEYWORD_DEFAULT COLON
     ;
 
-/* ------------------------------------------------------------------ */
+
 while_statement
     : KEYWORD_WHILE LPAREN expression RPAREN statement
         { printf("[Stmt] while (%s)\n", $3); free($3); }
@@ -397,7 +395,7 @@ do_while_statement
         { printf("[Stmt] do-while (%s)\n", $5); free($5); }
     ;
 
-/* ------------------------------------------------------------------ */
+
 for_statement
     : KEYWORD_FOR LPAREN for_init SEMICOLON for_cond SEMICOLON for_update RPAREN statement
         { printf("[Stmt] for(...)\n"); }
@@ -426,17 +424,17 @@ for_update
     | /* empty */
     ;
 
-/* ------------------------------------------------------------------ */
+
 /*  Enhanced for-each: for (Type var : collection)                     */
-/* ------------------------------------------------------------------ */
+
 for_each_statement
     : KEYWORD_FOR LPAREN type_specifier IDENTIFIER COLON expression RPAREN statement
         { printf("[Stmt] for-each: %s %s : ...\n", $3, $4); free($3); free($4); free($6); }
     ;
 
-/* ------------------------------------------------------------------ */
+
 /*  System.out.println / System.out.print                              */
-/* ------------------------------------------------------------------ */
+
 sysout_statement
     : IDENTIFIER DOT IDENTIFIER DOT IDENTIFIER LPAREN argument_list RPAREN SEMICOLON
         { printf("[Stmt] System.out.println/print(...)\n"); free($1); free($3); free($5); free($7); }
@@ -444,7 +442,7 @@ sysout_statement
         { printf("[Stmt] System.out.println()\n"); free($1); free($3); free($5); }
     ;
 
-/* ------------------------------------------------------------------ */
+
 return_statement
     : KEYWORD_RETURN expression SEMICOLON
         { printf("[Stmt] return %s\n", $2); free($2); }
@@ -476,9 +474,9 @@ catch_clause
         { printf("[Stmt] catch(%s %s)\n", $3, $4); free($3); free($4); }
     ;
 
-/* ================================================================== */
+
 /*  EXPRESSIONS                                                         */
-/* ================================================================== */
+
 
 expression
     : assignment_expr { $$ = $1; }
@@ -589,13 +587,13 @@ argument_list
 
 %%
 
-/* ------------------------------------------------------------------ */
+
 /*  Standalone test driver                                              */
 /*  Compile:  bison -d -o parser_java.tab.c parser_java.y             */
 /*            flex  -o lex.yy_java.c lexer_java.l                     */
 /*            g++ -o test_java parser_java.tab.c lex.yy_java.c        */
 /*  Run:      ./test_java ../../examples/Hello.java                    */
-/* ------------------------------------------------------------------ */
+
 #ifdef STANDALONE_MAIN
 int main(int argc, char* argv[]) {
     if (argc > 1) {

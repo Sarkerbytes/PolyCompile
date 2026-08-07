@@ -12,9 +12,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* ------------------------------------------------------------------ */
-/*  Connection to lexer                                                 */
-/* ------------------------------------------------------------------ */
+
+/*  Connection to lexer  */
+
 extern int  yylex(void);
 extern int  c_line;
 extern int  c_col;
@@ -31,16 +31,16 @@ void yyerror(const char* msg) {
 
 %}
 
-/* ------------------------------------------------------------------ */
+
 /*  Value types for semantic actions                                    */
-/* ------------------------------------------------------------------ */
+
 %union {
     char* string_val;   /* raw lexeme text  */
 }
 
-/* ------------------------------------------------------------------ */
+
 /*  Token declarations  (must match lexer_c.l returns)                 */
-/* ------------------------------------------------------------------ */
+
 
 /* Preprocessor */
 %token <string_val> HEADER_DIRECTIVE
@@ -96,18 +96,18 @@ void yyerror(const char* msg) {
 %token SEMICOLON COMMA COLON
 %token LPAREN RPAREN LBRACE RBRACE LBRACKET RBRACKET
 
-/* ------------------------------------------------------------------ */
+
 /*  Non-terminal types                                                  */
-/* ------------------------------------------------------------------ */
+
 %type <string_val> type_specifier
 %type <string_val> expression assignment_expr logical_or_expr logical_and_expr
 %type <string_val> equality_expr relational_expr additive_expr multiplicative_expr
 %type <string_val> unary_expr postfix_expr primary_expr
 %type <string_val> argument_list
 
-/* ------------------------------------------------------------------ */
+
 /*  Operator precedence (lowest → highest)                             */
-/* ------------------------------------------------------------------ */
+
 %right ASSIGN OP_PLUS_ASSIGN OP_MINUS_ASSIGN OP_MUL_ASSIGN OP_DIV_ASSIGN
 %left  OP_OR
 %left  OP_AND
@@ -118,16 +118,16 @@ void yyerror(const char* msg) {
 %right '!' OP_INC OP_DEC
 %left  LPAREN RPAREN LBRACKET RBRACKET
 
-/* ------------------------------------------------------------------ */
+
 /*  Grammar entry point                                                 */
-/* ------------------------------------------------------------------ */
+
 %start program
 
 %%
 
-/* ================================================================== */
+
 /*  TOP LEVEL                                                           */
-/* ================================================================== */
+
 
 program
     : declaration_list
@@ -145,17 +145,17 @@ declaration
     | var_declaration
     ;
 
-/* ------------------------------------------------------------------ */
+
 /*  Preprocessor directive                                              */
-/* ------------------------------------------------------------------ */
+
 header_directive
     : HEADER_DIRECTIVE
         { printf("[Token] Header directive: %s\n", $1); free($1); }
     ;
 
-/* ================================================================== */
+
 /*  TYPE SPECIFIER                                                      */
-/* ================================================================== */
+
 type_specifier
     : KEYWORD_INT    { $$ = $1; }
     | KEYWORD_FLOAT  { $$ = $1; }
@@ -165,9 +165,9 @@ type_specifier
     | KEYWORD_VOID   { $$ = "void"; }
     ;
 
-/* ================================================================== */
+
 /*  VARIABLE DECLARATION                                                */
-/* ================================================================== */
+
 var_declaration
     : type_specifier var_init_list SEMICOLON
         { printf("[Decl] Variable declaration: type=%s\n", $1); }
@@ -189,9 +189,9 @@ var_init
         { printf("[Decl] Array: %s[]\n", $1); free($1); }
     ;
 
-/* ================================================================== */
+
 /*  FUNCTION DEFINITION                                                 */
-/* ================================================================== */
+
 function_definition
     : type_specifier IDENTIFIER LPAREN param_list RPAREN compound_statement
         { printf("[Func] Function: %s %s(...)\n", $1, $2); free($1); free($2); }
@@ -218,9 +218,9 @@ param
         { printf("[Param] %s (unnamed)\n", $1); free($1); }
     ;
 
-/* ================================================================== */
+
 /*  COMPOUND STATEMENT  { ... }                                        */
-/* ================================================================== */
+
 compound_statement
     : LBRACE statement_list RBRACE
     | LBRACE RBRACE
@@ -231,9 +231,9 @@ statement_list
     | statement_list statement
     ;
 
-/* ================================================================== */
+
 /*  STATEMENTS                                                          */
-/* ================================================================== */
+
 statement
     : var_declaration
     | expression_statement
@@ -250,16 +250,16 @@ statement
     | continue_statement
     ;
 
-/* ------------------------------------------------------------------ */
+
 expression_statement
     : expression SEMICOLON
         { printf("[Stmt] Expression statement: %s\n", $1); free($1); }
     | SEMICOLON   /* empty statement */
     ;
 
-/* ------------------------------------------------------------------ */
+
 /*  IF / ELSE                                                           */
-/* ------------------------------------------------------------------ */
+
 if_statement
     : KEYWORD_IF LPAREN expression RPAREN statement
         { printf("[Stmt] if (%s)\n", $3); free($3); }
@@ -267,9 +267,9 @@ if_statement
         { printf("[Stmt] if (%s) ... else ...\n", $3); free($3); }
     ;
 
-/* ------------------------------------------------------------------ */
+
 /*  SWITCH                                                              */
-/* ------------------------------------------------------------------ */
+
 switch_statement
     : KEYWORD_SWITCH LPAREN expression RPAREN LBRACE case_list RBRACE
         { printf("[Stmt] switch (%s)\n", $3); free($3); }
@@ -290,25 +290,24 @@ case_clause
     | KEYWORD_DEFAULT COLON
     ;
 
-/* ------------------------------------------------------------------ */
 /*  WHILE                                                               */
-/* ------------------------------------------------------------------ */
+
 while_statement
     : KEYWORD_WHILE LPAREN expression RPAREN statement
         { printf("[Stmt] while (%s)\n", $3); free($3); }
     ;
 
-/* ------------------------------------------------------------------ */
+
 /*  DO-WHILE                                                            */
-/* ------------------------------------------------------------------ */
+
 do_while_statement
     : KEYWORD_DO statement KEYWORD_WHILE LPAREN expression RPAREN SEMICOLON
         { printf("[Stmt] do...while (%s)\n", $5); free($5); }
     ;
 
-/* ------------------------------------------------------------------ */
+
 /*  FOR                                                                 */
-/* ------------------------------------------------------------------ */
+
 for_statement
     : KEYWORD_FOR LPAREN for_init SEMICOLON for_cond SEMICOLON for_update RPAREN statement
         { printf("[Stmt] for(...)\n"); }
@@ -339,9 +338,9 @@ for_update
     | /* empty */
     ;
 
-/* ------------------------------------------------------------------ */
+
 /*  PRINTF                                                              */
-/* ------------------------------------------------------------------ */
+
 printf_statement
     : KEYWORD_PRINTF LPAREN argument_list RPAREN SEMICOLON
         { printf("[Stmt] printf(...)\n"); free($3); }
@@ -349,17 +348,17 @@ printf_statement
         { printf("[Stmt] printf()\n"); }
     ;
 
-/* ------------------------------------------------------------------ */
+
 /*  SCANF                                                               */
-/* ------------------------------------------------------------------ */
+
 scanf_statement
     : KEYWORD_SCANF LPAREN argument_list RPAREN SEMICOLON
         { printf("[Stmt] scanf(...)\n"); free($3); }
     ;
 
-/* ------------------------------------------------------------------ */
+
 /*  RETURN                                                              */
-/* ------------------------------------------------------------------ */
+
 return_statement
     : KEYWORD_RETURN expression SEMICOLON
         { printf("[Stmt] return %s\n", $2); free($2); }
@@ -367,7 +366,7 @@ return_statement
         { printf("[Stmt] return;\n"); }
     ;
 
-/* ------------------------------------------------------------------ */
+
 break_statement
     : KEYWORD_BREAK SEMICOLON
         { printf("[Stmt] break;\n"); }
@@ -378,9 +377,9 @@ continue_statement
         { printf("[Stmt] continue;\n"); }
     ;
 
-/* ================================================================== */
+
 /*  EXPRESSIONS (precedence already handled by %left/%right above)     */
-/* ================================================================== */
+
 
 expression
     : assignment_expr { $$ = $1; }
@@ -475,7 +474,7 @@ argument_list
 
 %%
 
-/* ------------------------------------------------------------------ */
+
 /*  main() – standalone test driver                                     */
 /*  Compile:  bison -d -o parser_c.tab.c parser_c.y                   */
 /*            flex  -o lex.yy_c.c  lexer_c.l                          */
