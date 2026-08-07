@@ -8,8 +8,13 @@
     "dev": "nodemon server.js"
   },
   "dependencies": {
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "ws": "^8.21.3"
   },
-  "keywords": ["polycompile", "compiler", "backend"],
+  "keywords": [
+    "polycompile",
+    "compiler",
+    "backend"
+  ],
   "license": "MIT"
 }

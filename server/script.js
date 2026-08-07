@@ -7,36 +7,30 @@
 
 /* â•â•â•â•â•â•â•â•â•â•â•â• SAMPLE DATA â•â•â•â•â•â•â•â•â•â•â•â• */
 const SAMPLE_CODE = {
-  java: `import java.util.Scanner;
+  java: `//PolyCompile - Your online Compiler.
+
+import java.util.Scanner;
 
 public class Hello {
   public static void main(String[] args) {
     System.out.println("Hello, World!");
-    int x = 10;
-    int y = 20;
-    int result = x + y;
-    System.out.println("Result = " + result);
   }
 }`,
-  cpp: `#include <iostream>
+  cpp: `//PolyCompile - Your online Compiler.
+  
+#include <iostream>
 using namespace std;
 
 int main() {
   cout << "Hello, World!" << endl;
-  int x = 10;
-  int y = 20;
-  int result = x + y;
-  cout << "Result = " << result << endl;
   return 0;
 }`,
-  c: `#include <stdio.h>
+  c: `//PolyCompile - Your online Compiler.
+  
+#include <stdio.h>
 
 int main() {
   printf("Hello, World!\\n");
-  int x = 10;
-  int y = 20;
-  int result = x + y;
-  printf("Result = %d\\n", result);
   return 0;
 }`
 };
@@ -89,10 +83,14 @@ function getOutputData(tab, lang) {
   if (!real) return READY_MSG(tab);
   if (real._offline) return SERVER_OFFLINE_MSG;
   switch (tab) {
-    case 'tokens':    return real.tokens    || '(tokens.txt was not generated)';
+    case 'lexical':
+      let lexOut = '';
+      lexOut += (real.symbols || '(symbol_table.txt was not generated)') + '\n\n';
+      lexOut += (real.tokens || '(tokens.txt was not generated)');
+      return lexOut;
     case 'ast':       return real.ast       || '(ast.txt was not generated)';
     case 'parsetree': return real.parseTree || '(parse_tree.txt was not generated)';
-    case 'symbols':   return real.symbols   || '(symbol_table.txt was not generated)';
+    case 'semantic':  return real.report    || '(semantic_report.txt was not generated)';
     case 'tac':       return real.tac       || '(tac.txt was not generated)';
     case 'opt':       return real.opt       || '(optimized_tac.txt was not generated)';
     case 'asm':       return real.asm       || '(target_code.asm was not generated)';
@@ -102,18 +100,19 @@ function getOutputData(tab, lang) {
 }
 
 const OUTPUT_FILES = {
-  tokens:    'output/tokens.txt',
+  lexical:   'output/tokens.txt & symbol_table.txt',
   ast:       'output/ast.txt',
   parsetree: 'output/parse_tree.txt',
-  symbols:   'output/symbol_table.txt',
+  semantic:  'output/semantic_report.txt',
   tac:       'output/tac.txt',
   opt:       'output/optimized_tac.txt',
-  asm:       'output/target_code.asm',
-  exec:      '[ PolyCompile Executor ]'
+  asm:       'output/target_code.asm'
 };
 
+/* --- Global WebSocket & Terminal State --- */
+let ws = null;
 let currentLang = 'java';
-let currentOutputTab = 'tokens';
+let currentOutputTab = 'lexical';
 let pipelineTimer = null;
 let pipelinePhase = 0;
 let isAnimating = false;
@@ -434,6 +433,8 @@ function updateCommandPreview() {
 
     const editorEl = document.getElementById('codeEditor');
     const code = editorEl ? editorEl.value : SAMPLE_CODE[currentLang];
+    const stdinEl = document.getElementById('stdinEditor');
+    const stdin = stdinEl ? stdinEl.value : '';
 
     // Animate phase labels while compilation runs
     let phaseIdx = 0;
@@ -444,7 +445,7 @@ function updateCommandPreview() {
       phaseIdx++;
     }, 300);
 
-    // ── Call real PolyCompile backend ──
+    // ── Call real PolyCompile backend (Analysis only) ──
     try {
       const resp = await fetch('/compile', {
         method: 'POST',
@@ -471,15 +472,18 @@ function updateCommandPreview() {
   function compileDone() {
     btn.classList.remove('running');
     btn.classList.add('done');
-    if (icon) icon.textContent = '✓';
 
-    const isReal = !!window._realOutput;
-    if (label) label.textContent = isReal ? 'Compiled by PolyCompile ✓' : 'Compilation Successful';
+    const out = window._realOutput;
+    const hasPolyError = out && out.polyError;
+
+    if (icon) icon.textContent = !hasPolyError ? '✓' : '✗';
+
+    if (label) label.textContent = !hasPolyError ? 'Compiled by PolyCompile ✓' : 'Compilation Failed';
     if (status) {
-      status.textContent = isReal
+      status.textContent = !hasPolyError
         ? '✓ Real PolyCompile output · All phases complete'
-        : '✓ No errors · Output written to output/';
-      status.style.color = 'var(--green)';
+        : '✗ Compilation error — see Lexical/Syntax tabs';
+      status.style.color = !hasPolyError ? 'var(--green)' : 'var(--pink)';
     }
 
     switchOutputTab('exec');
@@ -492,6 +496,116 @@ function updateCommandPreview() {
       if (label) label.textContent = 'Compile & Run';
       if (status) status.textContent = '';
     }, 4000);
+    
+    // Start Interactive Execution
+    startTerminalSession();
+  }
+})();
+
+/* ── WebSocket Terminal Logic ── */
+function startTerminalSession() {
+  const termOut = document.getElementById('terminalOutput');
+  const termRow = document.getElementById('termInputRow');
+  const termIn  = document.getElementById('terminalInput');
+  const termDot = document.getElementById('termStatusDot');
+  const termTxt = document.getElementById('termStatusText');
+  const termKill = document.getElementById('termKillBtn');
+  
+  if (!termOut) return;
+  termOut.textContent = '';
+  termRow.style.display = 'none';
+  termKill.style.display = 'none';
+  
+  if (ws) {
+    try { ws.close(); } catch (_) {}
+  }
+  
+  const code = document.getElementById('codeEditor')?.value || SAMPLE_CODE[currentLang];
+  
+  termDot.className = 'term-status-dot running';
+  termTxt.textContent = 'CONNECTING...';
+  
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  ws = new WebSocket(`${protocol}//${window.location.host}`);
+  
+  ws.onopen = () => {
+    termDot.className = 'term-status-dot running';
+    termTxt.textContent = 'RUNNING';
+    termRow.style.display = 'flex';
+    termKill.style.display = 'flex';
+    termIn.focus();
+    
+    ws.send(JSON.stringify({ type: 'run', lang: currentLang, code }));
+  };
+  
+  ws.onmessage = (e) => {
+    let msg;
+    try { msg = JSON.parse(e.data); } catch { return; }
+    
+    if (msg.type === 'stdout' || msg.type === 'stderr') {
+      termOut.textContent += msg.data;
+      termOut.parentElement.scrollTop = termOut.parentElement.scrollHeight;
+    } else if (msg.type === 'compile_error') {
+      termOut.textContent += '\n[Native Compilation Error]\n' + msg.data;
+      termOut.parentElement.scrollTop = termOut.parentElement.scrollHeight;
+    } else if (msg.type === 'exit') {
+      termOut.textContent += `\n\n[Process finished with exit code ${msg.code}]`;
+      termOut.parentElement.scrollTop = termOut.parentElement.scrollHeight;
+      endSession('finished', 'FINISHED');
+    } else if (msg.type === 'error') {
+      termOut.textContent += '\n\n[Error] ' + msg.data;
+      termOut.parentElement.scrollTop = termOut.parentElement.scrollHeight;
+      endSession('error', 'ERROR');
+    }
+  };
+  
+  ws.onclose = () => {
+    if (termTxt.textContent === 'RUNNING') {
+      endSession('finished', 'DISCONNECTED');
+    }
+  };
+  
+  ws.onerror = () => {
+    endSession('error', 'CONNECTION ERROR');
+  };
+  
+  function endSession(dotClass, txt) {
+    termDot.className = 'term-status-dot ' + dotClass;
+    termTxt.textContent = txt;
+    termRow.style.display = 'none';
+    termKill.style.display = 'none';
+  }
+}
+
+(function initTerminalInput() {
+  const termIn = document.getElementById('terminalInput');
+  const termSend = document.getElementById('termSendBtn');
+  const termKill = document.getElementById('termKillBtn');
+  
+  function sendInput() {
+    if (!ws || ws.readyState !== WebSocket.OPEN) return;
+    const val = termIn.value;
+    const termOut = document.getElementById('terminalOutput');
+    termOut.textContent += val + '\n';
+    ws.send(JSON.stringify({ type: 'stdin', data: val }));
+    termIn.value = '';
+    termOut.parentElement.scrollTop = termOut.parentElement.scrollHeight;
+  }
+  
+  if (termIn) {
+    termIn.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') sendInput();
+    });
+  }
+  if (termSend) {
+    termSend.addEventListener('click', sendInput);
+  }
+  if (termKill) {
+    termKill.addEventListener('click', () => {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'kill' }));
+      }
+    });
   }
 })();
 
@@ -565,7 +679,7 @@ function animateNextPhase() {
     tab.addEventListener('click', () => switchOutputTab(tab.dataset.tab));
   });
   // Init
-  switchOutputTab('tokens');
+  switchOutputTab('lexical');
 })();
 
 function switchOutputTab(tab) {
@@ -573,24 +687,33 @@ function switchOutputTab(tab) {
   const tabs = document.querySelectorAll('.otab');
   tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
 
+  const analysisPanel = document.getElementById('analysisPanel');
+  const terminalPanel = document.getElementById('terminalPanel');
   const content = document.getElementById('outputContent');
   const fileLabel = document.getElementById('opFileLabel');
 
-  if (content) {
-    content.style.opacity = '0';
-    content.style.transform = 'translateY(6px)';
-    setTimeout(() => {
-      // Use language-aware data getter for all tabs
-      content.textContent = getOutputData(tab, currentLang);
-      content.style.opacity = '1';
-      content.style.transform = 'translateY(0)';
-    }, 150);
+  if (tab === 'exec') {
+    if (analysisPanel) analysisPanel.style.display = 'none';
+    if (terminalPanel) terminalPanel.style.display = 'flex';
+  } else {
+    if (terminalPanel) terminalPanel.style.display = 'none';
+    if (analysisPanel) {
+      analysisPanel.style.display = 'block';
+      content.style.opacity = '0';
+      content.style.transform = 'translateY(6px)';
+      setTimeout(() => {
+        content.textContent = getOutputData(tab, currentLang);
+        content.style.opacity = '1';
+        content.style.transform = 'translateY(0)';
+      }, 150);
+    }
+    if (fileLabel) fileLabel.textContent = OUTPUT_FILES[tab] || '';
   }
-  if (fileLabel) fileLabel.textContent = OUTPUT_FILES[tab] || '';
 }
 
 /* Silently refresh the current output tab when language changes â€” no tab switch, no fade delay */
 function refreshOutputPanel() {
+  if (currentOutputTab === 'exec') return; // Don't refresh terminal on language change
   const content = document.getElementById('outputContent');
   const fileLabel = document.getElementById('opFileLabel');
   if (content) {
@@ -616,6 +739,43 @@ function refreshOutputPanel() {
     if (!content) return;
     try {
       await navigator.clipboard.writeText(content.textContent);
+      if (text) text.textContent = 'Copied!';
+      btn.style.color = 'var(--green)';
+      btn.style.borderColor = 'var(--green)';
+      setTimeout(() => {
+        if (text) text.textContent = 'Copy';
+        btn.style.color = '';
+        btn.style.borderColor = '';
+      }, 2000);
+    } catch {
+      if (text) text.textContent = 'Failed';
+      setTimeout(() => { if (text) text.textContent = 'Copy'; }, 1500);
+    }
+  });
+})();
+
+// Stdin clear button (Old stdin panel)
+(function initStdinClear() {
+  const btn = document.getElementById('stdinClearBtn');
+  const editor = document.getElementById('stdinEditor');
+  if (!btn || !editor) return;
+  btn.addEventListener('click', () => {
+    editor.value = '';
+    editor.focus();
+  });
+})();
+
+// Terminal copy button
+(function initTermCopyBtn() {
+  const btn = document.getElementById('copyTermBtn');
+  const text = document.getElementById('copyTermText');
+  if (!btn) return;
+  
+  btn.addEventListener('click', async () => {
+    const termOut = document.getElementById('terminalOutput');
+    if (!termOut) return;
+    try {
+      await navigator.clipboard.writeText(termOut.textContent);
       if (text) text.textContent = 'Copied!';
       btn.style.color = 'var(--green)';
       btn.style.borderColor = 'var(--green)';

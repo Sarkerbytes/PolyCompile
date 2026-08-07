@@ -47,7 +47,7 @@ void Semantic_Java::checkNode(ASTNodePtr node) {
             }
 
             if (!symbolTable.declare(func->name, func->returnType, true, paramTypes)) {
-                DiagnosticEngine::logSemanticError(filename, 0, 0,
+                DiagnosticEngine::logSemanticError(filename, node->line, node->col,
                     "Duplicate Java method declaration: " + func->name);
                 reportLines.push_back("Error: Duplicate method '" + func->name + "'");
             } else {
@@ -65,7 +65,7 @@ void Semantic_Java::checkNode(ASTNodePtr node) {
         case ASTNodeType::VAR_DECL: {
             auto vd = std::dynamic_pointer_cast<VarDeclNode>(node);
             if (!symbolTable.declare(vd->varName, vd->varType)) {
-                DiagnosticEngine::logSemanticError(filename, 0, 0,
+                DiagnosticEngine::logSemanticError(filename, node->line, node->col,
                     "Duplicate Java variable declaration: " + vd->varName);
                 reportLines.push_back("Error: Duplicate variable '" + vd->varName + "'");
             } else {
@@ -90,7 +90,7 @@ void Semantic_Java::checkNode(ASTNodePtr node) {
                     "System", "Scanner", "Math", "Integer", "String", "args"
                 };
                 if (builtins.find(var->name) == builtins.end()) {
-                    DiagnosticEngine::logSemanticError(filename, 0, 0,
+                    DiagnosticEngine::logSemanticError(filename, node->line, node->col,
                         "Undeclared Java variable: " + var->name);
                     reportLines.push_back("Error: Undeclared variable '" + var->name + "'");
                 }
@@ -101,9 +101,14 @@ void Semantic_Java::checkNode(ASTNodePtr node) {
             auto ass = std::dynamic_pointer_cast<AssignNode>(node);
             SymbolJava* sym = symbolTable.lookup(ass->varName);
             if (!sym) {
-                DiagnosticEngine::logSemanticError(filename, 0, 0,
-                    "Undeclared Java variable in assignment: " + ass->varName);
+                DiagnosticEngine::logSemanticError(filename, node->line, node->col, "Undeclared Java variable assignment: " + ass->varName);
                 reportLines.push_back("Error: Undeclared variable '" + ass->varName + "'");
+            } else if (ass->expr && ass->expr->getType() == ASTNodeType::LITERAL_EXPR) {
+                auto lit = std::dynamic_pointer_cast<LiteralNode>(ass->expr);
+                if ((sym->type == "int" || sym->type == "float" || sym->type == "double") && lit->valueType == "string") {
+                    DiagnosticEngine::logSemanticError(filename, node->line, node->col, "Type mismatch: cannot assign string to numeric variable '" + ass->varName + "'");
+                    reportLines.push_back("Error: Type mismatch on '" + ass->varName + "'");
+                }
             }
             if (ass->expr) checkNode(ass->expr);
             break;

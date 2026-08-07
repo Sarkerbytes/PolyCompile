@@ -36,7 +36,7 @@ void Semantic_CPP::checkNode(ASTNodePtr node) {
             if (existing && existing->isFunction && existing->type == func->returnType) {
                 reportLines.push_back("C++ Function defined (was forward declared): " + func->returnType + " " + func->name);
             } else if (!symbolTable.declare(func->name, func->returnType, true, paramTypes)) {
-                DiagnosticEngine::logSemanticError(filename, 0, 0, "Duplicate C++ function declaration: " + func->name);
+                DiagnosticEngine::logSemanticError(filename, node->line, node->col, "Duplicate C++ function declaration: " + func->name);
                 reportLines.push_back("Error: Duplicate function '" + func->name + "'");
             } else {
                 reportLines.push_back("C++ Function declared: " + func->returnType + " " + func->name);
@@ -45,7 +45,7 @@ void Semantic_CPP::checkNode(ASTNodePtr node) {
             symbolTable.enterScope();
             for (const auto& p : func->parameters) {
                 if (!symbolTable.declare(p.name, p.type)) {
-                    DiagnosticEngine::logSemanticError(filename, 0, 0, "Duplicate C++ parameter name: " + p.name);
+                    DiagnosticEngine::logSemanticError(filename, node->line, node->col, "Duplicate C++ parameter name: " + p.name);
                 }
             }
 
@@ -56,7 +56,7 @@ void Semantic_CPP::checkNode(ASTNodePtr node) {
         case ASTNodeType::VAR_DECL: {
             auto vd = std::dynamic_pointer_cast<VarDeclNode>(node);
             if (!symbolTable.declare(vd->varName, vd->varType)) {
-                DiagnosticEngine::logSemanticError(filename, 0, 0, "Duplicate C++ variable declaration: " + vd->varName);
+                DiagnosticEngine::logSemanticError(filename, node->line, node->col, "Duplicate C++ variable declaration: " + vd->varName);
                 reportLines.push_back("Error: Duplicate variable '" + vd->varName + "'");
             } else {
                 reportLines.push_back("C++ Variable declared: " + vd->varType + " " + vd->varName);
@@ -75,7 +75,7 @@ void Semantic_CPP::checkNode(ASTNodePtr node) {
             auto var = std::dynamic_pointer_cast<VarExprNode>(node);
             SymbolCPP* sym = symbolTable.lookup(var->name);
             if (!sym) {
-                DiagnosticEngine::logSemanticError(filename, 0, 0, "Undeclared C++ variable: " + var->name);
+                DiagnosticEngine::logSemanticError(filename, node->line, node->col, "Undeclared C++ variable: " + var->name);
                 reportLines.push_back("Error: Undeclared variable '" + var->name + "'");
             }
             break;
@@ -84,7 +84,7 @@ void Semantic_CPP::checkNode(ASTNodePtr node) {
             auto in = std::dynamic_pointer_cast<InputNode>(node);
             SymbolCPP* sym = symbolTable.lookup(in->targetVar);
             if (!sym) {
-                DiagnosticEngine::logSemanticError(filename, 0, 0, "Undeclared C++ cin target: " + in->targetVar);
+                DiagnosticEngine::logSemanticError(filename, node->line, node->col, "Undeclared C++ cin target: " + in->targetVar);
                 reportLines.push_back("Error: Undeclared cin target '" + in->targetVar + "'");
             }
             break;
@@ -93,8 +93,14 @@ void Semantic_CPP::checkNode(ASTNodePtr node) {
             auto ass = std::dynamic_pointer_cast<AssignNode>(node);
             SymbolCPP* sym = symbolTable.lookup(ass->varName);
             if (!sym) {
-                DiagnosticEngine::logSemanticError(filename, 0, 0, "Undeclared C++ variable assignment: " + ass->varName);
+                DiagnosticEngine::logSemanticError(filename, node->line, node->col, "Undeclared C++ variable assignment: " + ass->varName);
                 reportLines.push_back("Error: Undeclared variable '" + ass->varName + "'");
+            } else if (ass->expr && ass->expr->getType() == ASTNodeType::LITERAL_EXPR) {
+                auto lit = std::dynamic_pointer_cast<LiteralNode>(ass->expr);
+                if ((sym->type == "int" || sym->type == "float" || sym->type == "double") && lit->valueType == "string") {
+                    DiagnosticEngine::logSemanticError(filename, node->line, node->col, "Type mismatch: cannot assign string to numeric variable '" + ass->varName + "'");
+                    reportLines.push_back("Error: Type mismatch on '" + ass->varName + "'");
+                }
             }
             if (ass->expr) checkNode(ass->expr);
             break;
@@ -103,7 +109,7 @@ void Semantic_CPP::checkNode(ASTNodePtr node) {
             auto call = std::dynamic_pointer_cast<CallExprNode>(node);
             SymbolCPP* sym = symbolTable.lookup(call->funcName);
             if (!sym || !sym->isFunction) {
-                DiagnosticEngine::logSemanticError(filename, 0, 0, "Undeclared C++ function call: " + call->funcName);
+                DiagnosticEngine::logSemanticError(filename, node->line, node->col, "Undeclared C++ function call: " + call->funcName);
                 reportLines.push_back("Error: Undeclared function '" + call->funcName + "'");
             }
             for (const auto& arg : call->args) checkNode(arg);

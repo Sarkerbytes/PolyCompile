@@ -1,0 +1,86 @@
+
+/* ------------ INTERACTIVE TERMINAL PANEL ------------ */
+.terminal-panel {
+  display: flex;
+  flex-direction: column;
+}
+.terminal-body {
+  display: flex;
+  flex-direction: column;
+  background: #000;
+  padding: 16px;
+  min-height: 200px;
+}
+.terminal-output {
+  padding: 0;
+  margin: 0;
+  color: #a0aec0;
+  font-family: var(--font-code);
+  font-size: 13.5px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.terminal-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+.term-prompt {
+  color: var(--green);
+  font-size: 12px;
+}
+.terminal-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-family: var(--font-code);
+  font-size: 13.5px;
+}
+.terminal-input::placeholder {
+  color: #4a5568;
+}
+.term-send-btn {
+  background: rgba(0,255,136,0.1);
+  color: var(--green);
+  border: 1px solid rgba(0,255,136,0.2);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  transition: var(--t-fast);
+}
+.term-send-btn:hover {
+  background: rgba(0,255,136,0.2);
+}
+.term-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4a5568;
+  margin-left: 12px;
+}
+.term-status-dot.running {
+  background: var(--amber);
+  box-shadow: 0 0 8px var(--amber);
+  animation: blink 1s infinite;
+}
+.term-status-dot.finished {
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+}
+.term-status-dot.error {
+  background: var(--pink);
+  box-shadow: 0 0 8px var(--pink);
+}
+.term-status-text {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-weight: 600;
+  text-transform: uppercase;
+}

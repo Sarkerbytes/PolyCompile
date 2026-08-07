@@ -32,6 +32,9 @@ enum class ASTNodeType {
 
 class ASTNode {
 public:
+    int line = 0;
+    int col = 0;
+    
     virtual ~ASTNode() {}
     virtual ASTNodeType getType() const = 0;
     virtual std::string toString(int indent = 0) const = 0;

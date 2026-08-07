@@ -193,6 +193,7 @@
             <textarea class="code-editor" id="codeEditor" spellcheck="false" autocomplete="off" autocorrect="off"
               autocapitalize="off"></textarea>
           </div>
+
           <!-- New Footer for Compile Button -->
           <div class="editor-footer"
             style="padding: 16px; border-top: 1px solid var(--border); display: flex; flex-direction: column; align-items: flex-end; gap: 12px; background: rgba(0,0,0,0.15);">
@@ -295,17 +296,17 @@
 
     <div class="output-container">
       <div class="output-tabs" id="outputTabs" role="tablist">
-        <button class="otab active" data-tab="tokens" id="otab-tokens" role="tab">Tokens</button>
-        <button class="otab" data-tab="ast" id="otab-ast" role="tab">AST</button>
-        <button class="otab" data-tab="parsetree" id="otab-parsetree" role="tab">Parse Tree</button>
-        <button class="otab" data-tab="symbols" id="otab-symbols" role="tab">Symbol Table</button>
+        <button class="otab active" data-tab="lexical" id="otab-lexical" role="tab">Lexical Analysis</button>
+        <button class="otab" data-tab="parsetree" id="otab-parsetree" role="tab">Syntax Analysis</button>
+        <button class="otab" data-tab="semantic" id="otab-semantic" role="tab">Semantic Analysis</button>
         <button class="otab" data-tab="tac" id="otab-tac" role="tab">TAC</button>
         <button class="otab" data-tab="opt" id="otab-opt" role="tab">Opt. TAC</button>
         <button class="otab" data-tab="asm" id="otab-asm" role="tab">Assembly</button>
         <button class="otab" data-tab="exec" id="otab-exec" role="tab">Execution</button>
       </div>
 
-      <div class="output-panel">
+      <!-- Analysis output panel (tokens, ast, etc.) -->
+      <div class="output-panel" id="analysisPanel">
         <div class="op-toolbar">
           <div class="op-file-info">
             <span class="op-file-icon">📄</span>
@@ -323,8 +324,42 @@
           <pre class="op-pre" id="outputContent" role="tabpanel"></pre>
         </div>
       </div>
+
+      <!-- Interactive terminal panel (Execution tab only) -->
+      <div class="output-panel terminal-panel" id="terminalPanel" style="display:none;">
+        <div class="op-toolbar">
+          <div class="op-file-info">
+            <span class="op-file-icon">⚡</span>
+            <span class="op-file-label" id="termFileLabel">[ PolyCompile Executor ]</span>
+            <span class="term-status-dot" id="termStatusDot"></span>
+            <span class="term-status-text" id="termStatusText">idle</span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button class="copy-btn" id="copyTermBtn" aria-label="Copy terminal output">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="9" y="9" width="13" height="13" rx="2" />
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+              </svg>
+              <span id="copyTermText">Copy</span>
+            </button>
+            <button class="copy-btn" id="termKillBtn" aria-label="Kill process" title="Kill running process" style="display:none;border-color:var(--pink);color:var(--pink);">
+              ✕ Kill
+            </button>
+          </div>
+        </div>
+        <div class="op-body terminal-body" id="terminalBody">
+          <pre class="op-pre terminal-output" id="terminalOutput"></pre>
+          <!-- Input row, shown when process is running -->
+          <div class="terminal-input-row" id="termInputRow" style="display:none;">
+            <span class="term-prompt">▶</span>
+            <input class="terminal-input" id="terminalInput" type="text"
+              placeholder="Type input and press Enter…" autocomplete="off" spellcheck="false" />
+            <button class="term-send-btn" id="termSendBtn">↵ Send</button>
+          </div>
+        </div>
+      </div>
     </div>
-  </section>
+
 
   <!-- ═══ FEATURES / OPTIMIZATIONS ═══ -->
   <section class="features-section" id="features">

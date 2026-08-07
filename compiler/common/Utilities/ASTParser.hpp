@@ -52,11 +52,24 @@ bool isAtEnd() const {
     }
 
 public:
+    template<typename T>
+    std::shared_ptr<T> createNode() {
+        auto node = std::make_shared<T>();
+        if (!tokens.empty()) {
+            size_t idx = (pos > 0) ? pos - 1 : 0;
+            if (idx < tokens.size()) {
+                node->line = tokens[idx].line;
+                node->col = tokens[idx].column;
+            }
+        }
+        return node;
+    }
+
     ASTParser(const std::vector<Token>& toks, bool javaMode = false)
         : tokens(toks), pos(0), isJava(javaMode) {}
 
     ASTNodePtr parseProgram() {
-        auto prog = std::make_shared<ProgramNode>();
+        auto prog = createNode<ProgramNode>();
 
         while (!isAtEnd()) {
             Token t = peek();
@@ -117,7 +130,7 @@ public:
                     pos += lookahead + 1;
                     while (!isAtEnd() && peek().lexeme != "{") advance();
                     if (match("{")) {
-                        auto func = std::make_shared<FunctionNode>();
+                        auto func = createNode<FunctionNode>();
                         func->name = "main";
                         func->returnType = isJava ? "void" : retType;
                         func->body = parseBlock();
@@ -129,7 +142,7 @@ public:
 
             if (t.lexeme == "{") {
                 match("{");
-                auto func = std::make_shared<FunctionNode>();
+                auto func = createNode<FunctionNode>();
                 func->name = "main";
                 func->returnType = isJava ? "void" : "int";
                 func->body = parseBlock();
@@ -142,10 +155,10 @@ public:
 
         if (prog->declarations.empty()) {
             pos = 0;
-            auto func = std::make_shared<FunctionNode>();
+            auto func = createNode<FunctionNode>();
             func->name = "main";
             func->returnType = isJava ? "void" : "int";
-            auto block = std::make_shared<BlockNode>();
+            auto block = createNode<BlockNode>();
             while (!isAtEnd()) {
                 Token t = peek();
                 if (t.lexeme == "#include" || t.lexeme.find("#include") == 0) {
@@ -172,7 +185,7 @@ public:
 
 private:
     ASTNodePtr parseBlock() {
-        auto block = std::make_shared<BlockNode>();
+        auto block = createNode<BlockNode>();
         while (!isAtEnd() && peek().lexeme != "}") {
             auto stmt = parseStatement();
             if (stmt) {
@@ -205,7 +218,7 @@ private:
             } else {
                 body = parseStatement();
             }
-            auto node = std::make_shared<WhileNode>();
+            auto node = createNode<WhileNode>();
             node->condition = cond;
             node->body = body;
             return node;
@@ -235,7 +248,7 @@ private:
             } else {
                 body = parseStatement();
             }
-            auto node = std::make_shared<ForNode>();
+            auto node = createNode<ForNode>();
             node->init = init;
             node->condition = cond;
             node->update = update;
@@ -262,7 +275,7 @@ private:
                     elseB = parseStatement();
                 }
             }
-            auto node = std::make_shared<IfNode>();
+            auto node = createNode<IfNode>();
             node->condition = cond;
             node->thenBranch = thenB;
             node->elseBranch = elseB;
@@ -272,7 +285,7 @@ private:
         if (t.lexeme == "switch") {
             advance();
             expect("("); auto expr = parseExpression(); expect(")"); expect("{");
-            auto node = std::make_shared<SwitchNode>();
+            auto node = createNode<SwitchNode>();
             node->expression = expr;
             while (!isAtEnd() && !check("}")) {
                 if (match("case")) {
@@ -301,18 +314,18 @@ private:
             if (!check(";")) {
                 expr = parseExpression();
             }
-            expect(";"); auto node = std::make_shared<ReturnNode>();
+            expect(";"); auto node = createNode<ReturnNode>();
             node->expr = expr;
             return node;
         }
 
         if (t.lexeme == "break") {
             advance();
-            expect(";"); return std::make_shared<BreakNode>();
+            expect(";"); return createNode<BreakNode>();
         }
         if (t.lexeme == "continue") {
             advance();
-            expect(";"); return std::make_shared<ContinueNode>();
+            expect(";"); return createNode<ContinueNode>();
         }
 
         if (t.lexeme == "printf" || t.lexeme == "cout" || t.lexeme == "System.out.println" || t.lexeme == "System.out.print" || (t.lexeme == "System" && peek(1).lexeme == "." && peek(2).lexeme == "out")) {
@@ -325,7 +338,7 @@ private:
 
         if (t.lexeme == "int" || t.lexeme == "float" || t.lexeme == "double" || t.lexeme == "char" || t.lexeme == "String" || t.lexeme == "bool") {
             std::string typeStr = advance().lexeme;
-            auto listNode = std::make_shared<VarDeclListNode>();
+            auto listNode = createNode<VarDeclListNode>();
 
             while (!isAtEnd()) {
                 if (peek().type != TokenType::IDENTIFIER) break;
@@ -334,7 +347,7 @@ private:
                 if (match("=")) {
                     initExpr = parseExpression();
                 }
-                auto vd = std::make_shared<VarDeclNode>();
+                auto vd = createNode<VarDeclNode>();
                 vd->varType = typeStr;
                 vd->varName = varName;
                 vd->initExpr = initExpr;
@@ -353,7 +366,7 @@ private:
             if (check("=") || check("+=") || check("-=") || check("*=") || check("/=")) {
                 std::string op = advance().lexeme;
                 auto expr = parseExpression(); expect(";");
-                auto ass = std::make_shared<AssignNode>();
+                auto ass = createNode<AssignNode>();
                 ass->varName = varName;
                 ass->op = op;
                 ass->expr = expr;
@@ -361,9 +374,9 @@ private:
             }
             if (check("++") || check("--")) {
                 std::string op = advance().lexeme;
-                expect(";"); auto un = std::make_shared<UnaryExprNode>();
+                expect(";"); auto un = createNode<UnaryExprNode>();
                 un->op = (op == "++") ? "post++" : "post--";
-                un->operand = std::make_shared<VarExprNode>();
+                un->operand = createNode<VarExprNode>();
                 std::dynamic_pointer_cast<VarExprNode>(un->operand)->name = varName;
                 return un;
             }
@@ -374,7 +387,7 @@ private:
     }
 
     ASTNodePtr parseOutput() {
-        auto node = std::make_shared<OutputNode>();
+        auto node = createNode<OutputNode>();
         Token t = advance();
 
         if (t.lexeme == "printf") {
@@ -418,7 +431,7 @@ private:
     }
 
     ASTNodePtr parseInput() {
-        auto node = std::make_shared<InputNode>();
+        auto node = createNode<InputNode>();
         Token t = advance();
         if (t.lexeme == "scanf") { expect("(");
             if (peek().type == TokenType::STRING_LITERAL) advance();
@@ -457,7 +470,7 @@ private:
         while (check("==") || check("!=")) {
             std::string op = advance().lexeme;
             auto right = parseRelational();
-            auto bin = std::make_shared<BinaryExprNode>();
+            auto bin = createNode<BinaryExprNode>();
             bin->op = op;
             bin->left = expr;
             bin->right = right;
@@ -471,7 +484,7 @@ private:
         while (check("<") || check(">") || check("<=") || check(">=")) {
             std::string op = advance().lexeme;
             auto right = parseAdditive();
-            auto bin = std::make_shared<BinaryExprNode>();
+            auto bin = createNode<BinaryExprNode>();
             bin->op = op;
             bin->left = expr;
             bin->right = right;
@@ -485,7 +498,7 @@ private:
         while (check("+") || check("-")) {
             std::string op = advance().lexeme;
             auto right = parseMultiplicative();
-            auto bin = std::make_shared<BinaryExprNode>();
+            auto bin = createNode<BinaryExprNode>();
             bin->op = op;
             bin->left = expr;
             bin->right = right;
@@ -499,7 +512,7 @@ private:
         while (check("*") || check("/") || check("%")) {
             std::string op = advance().lexeme;
             auto right = parsePrimary();
-            auto bin = std::make_shared<BinaryExprNode>();
+            auto bin = createNode<BinaryExprNode>();
             bin->op = op;
             bin->left = expr;
             bin->right = right;
@@ -522,7 +535,7 @@ private:
 
         if (t.type == TokenType::INT_LITERAL || t.type == TokenType::FLOAT_LITERAL) {
             advance();
-            auto lit = std::make_shared<LiteralNode>();
+            auto lit = createNode<LiteralNode>();
             lit->value = t.lexeme;
             lit->valueType = (t.type == TokenType::INT_LITERAL) ? "int" : "float";
             return lit;
@@ -530,7 +543,7 @@ private:
 
         if (t.type == TokenType::STRING_LITERAL) {
             advance();
-            auto lit = std::make_shared<LiteralNode>();
+            auto lit = createNode<LiteralNode>();
             lit->value = t.lexeme;
             lit->valueType = "string";
             return lit;
@@ -538,7 +551,7 @@ private:
 
         if (t.lexeme == "true" || t.lexeme == "false") {
             advance();
-            auto lit = std::make_shared<LiteralNode>();
+            auto lit = createNode<LiteralNode>();
             lit->value = t.lexeme;
             lit->valueType = "bool";
             return lit;
@@ -548,14 +561,14 @@ private:
             advance();
             if (check("++") || check("--")) {
                 std::string op = advance().lexeme;
-                auto un = std::make_shared<UnaryExprNode>();
+                auto un = createNode<UnaryExprNode>();
                 un->op = (op == "++") ? "post++" : "post--";
-                auto var = std::make_shared<VarExprNode>();
+                auto var = createNode<VarExprNode>();
                 var->name = t.lexeme;
                 un->operand = var;
                 return un;
             }
-            auto var = std::make_shared<VarExprNode>();
+            auto var = createNode<VarExprNode>();
             var->name = t.lexeme;
             return var;
         }

@@ -37,7 +37,7 @@ void Semantic_C::checkNode(ASTNodePtr node) {
                 // Forward declaration redefinition is OK - skip re-insertion
                 reportLines.push_back("Function defined (was forward declared): " + func->returnType + " " + func->name);
             } else if (!symbolTable.declare(func->name, func->returnType, true, paramTypes)) {
-                DiagnosticEngine::logSemanticError(filename, 0, 0, "Duplicate function declaration: " + func->name);
+                DiagnosticEngine::logSemanticError(filename, node->line, node->col, "Duplicate function declaration: " + func->name);
                 reportLines.push_back("Error: Duplicate function '" + func->name + "'");
             } else {
                 reportLines.push_back("Function declared: " + func->returnType + " " + func->name);
@@ -47,7 +47,7 @@ void Semantic_C::checkNode(ASTNodePtr node) {
             currentFuncReturnType = func->returnType;
             for (const auto& p : func->parameters) {
                 if (!symbolTable.declare(p.name, p.type)) {
-                    DiagnosticEngine::logSemanticError(filename, 0, 0, "Duplicate parameter name: " + p.name);
+                    DiagnosticEngine::logSemanticError(filename, node->line, node->col, "Duplicate parameter name: " + p.name);
                 }
             }
 
@@ -58,7 +58,7 @@ void Semantic_C::checkNode(ASTNodePtr node) {
         case ASTNodeType::VAR_DECL: {
             auto vd = std::dynamic_pointer_cast<VarDeclNode>(node);
             if (!symbolTable.declare(vd->varName, vd->varType)) {
-                DiagnosticEngine::logSemanticError(filename, 0, 0, "Duplicate variable declaration: " + vd->varName);
+                DiagnosticEngine::logSemanticError(filename, node->line, node->col, "Duplicate variable declaration: " + vd->varName);
                 reportLines.push_back("Error: Duplicate variable '" + vd->varName + "'");
             } else {
                 reportLines.push_back("Variable declared: " + vd->varType + " " + vd->varName);
@@ -86,7 +86,7 @@ void Semantic_C::checkNode(ASTNodePtr node) {
             auto var = std::dynamic_pointer_cast<VarExprNode>(node);
             SymbolC* sym = symbolTable.lookup(var->name);
             if (!sym) {
-                DiagnosticEngine::logSemanticError(filename, 0, 0, "Undeclared variable: " + var->name);
+                DiagnosticEngine::logSemanticError(filename, node->line, node->col, "Undeclared variable: " + var->name);
                 reportLines.push_back("Error: Undeclared variable '" + var->name + "'");
             }
             break;
@@ -95,8 +95,14 @@ void Semantic_C::checkNode(ASTNodePtr node) {
             auto ass = std::dynamic_pointer_cast<AssignNode>(node);
             SymbolC* sym = symbolTable.lookup(ass->varName);
             if (!sym) {
-                DiagnosticEngine::logSemanticError(filename, 0, 0, "Undeclared variable assignment: " + ass->varName);
+                DiagnosticEngine::logSemanticError(filename, node->line, node->col, "Undeclared variable assignment: " + ass->varName);
                 reportLines.push_back("Error: Undeclared variable '" + ass->varName + "'");
+            } else if (ass->expr && ass->expr->getType() == ASTNodeType::LITERAL_EXPR) {
+                auto lit = std::dynamic_pointer_cast<LiteralNode>(ass->expr);
+                if ((sym->type == "int" || sym->type == "float" || sym->type == "double") && lit->valueType == "string") {
+                    DiagnosticEngine::logSemanticError(filename, node->line, node->col, "Type mismatch: cannot assign string to numeric variable '" + ass->varName + "'");
+                    reportLines.push_back("Error: Type mismatch on '" + ass->varName + "'");
+                }
             }
             if (ass->expr) checkNode(ass->expr);
             break;
@@ -105,7 +111,7 @@ void Semantic_C::checkNode(ASTNodePtr node) {
             auto call = std::dynamic_pointer_cast<CallExprNode>(node);
             SymbolC* sym = symbolTable.lookup(call->funcName);
             if (!sym || !sym->isFunction) {
-                DiagnosticEngine::logSemanticError(filename, 0, 0, "Undeclared function call: " + call->funcName);
+                DiagnosticEngine::logSemanticError(filename, node->line, node->col, "Undeclared function call: " + call->funcName);
                 reportLines.push_back("Error: Undeclared function '" + call->funcName + "'");
             }
             for (const auto& arg : call->args) checkNode(arg);
