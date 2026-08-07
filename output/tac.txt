@@ -4,6 +4,7 @@ x = 10
 y = 20
 t0 = x + y
 result = t0
-t1 = "Result = " + result
-print t1
+print "Result = "
+print result
+return 0
 return 0

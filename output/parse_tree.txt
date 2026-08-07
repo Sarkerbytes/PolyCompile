@@ -1,13 +1,13 @@
 - Syntax Analysis : Parse Tree -
 
-                                          <Program>   
-                                              |       
-                                           <main>    
-                                              |      
-                                           <Block>   
-                              /     /      /        \
-          <printf>    <decl:id15>  <decl:id16>       <decl:id17>           <printf>    
-              |            |            |                 |                    |       
-      <"Hello, World!">  <10>         <20>               <+>                  <+>   
-                                                        /   \               /     \ 
-                                                   <id15>  <id16>  <"Result = ">  <id17>    
+                                              <Program>   
+                                                  |       
+                                               <main>    
+                                                  |      
+                                               <Block>   
+                                /     /     /       \    
+          <printf>    <decl:id7>  <decl:id8>     <decl:id9>           <printf>    <return>    
+              |            |           |              |                /     \        |       
+      <"Hello, World!">  <10>        <20>            <+>       <"Result = ">  <id9>  <0>   
+                                                    /   \                                  
+                                                 <id7>  <id8>   

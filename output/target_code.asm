@@ -14,10 +14,10 @@ main:
   MOV R1, t0
   STORE R1, result
   LOAD R1, "Result = "
-  LOAD R2, t0
-  ADD R1, R2
-  STORE R1, t1
-  LOAD R1, t1
   PRINT R1
+  LOAD R1, t0
+  PRINT R1
+  LOAD R1, 0
+  RET
   LOAD R1, 0
   RET
